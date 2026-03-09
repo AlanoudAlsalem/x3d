@@ -1,5 +1,8 @@
 """
 3D convolution (no PyTorch). Supports standard and depthwise (groups=in_channels).
+
+Uses OpenCV's cv2.filter2D for accelerated convolution. Fallback: conv3d_forward_slow()
+for platforms without OpenCV (e.g. some RISC-V embedded systems).
 """
 
 from __future__ import annotations

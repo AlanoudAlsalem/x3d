@@ -1,6 +1,6 @@
 # X3D-M: PyTorch-Free Implementation for RISC-V SoC
 
-X3D-M (eXpand-3D Medium) video classification model built from scratch using **NumPy only**—no PyTorch. Designed for platforms where PyTorch is unavailable, such as the PolarFire SoC Icicle Kit (RISC-V).
+X3D-M (eXpand-3D Medium) video classification model built from scratch using **NumPy and OpenCV**—no PyTorch. Designed for platforms where PyTorch is unavailable, such as the PolarFire SoC Icicle Kit (RISC-V).
 
 - **Input:** Video clip `(B, 3, 16, 224, 224)` — batch, RGB, 16 frames, 224×224 spatial
 - **Output:** Class logits `(B, 400)` for Kinetics-400 action recognition
@@ -12,6 +12,7 @@ X3D-M (eXpand-3D Medium) video classification model built from scratch using **N
 
 - Python 3.8+
 - NumPy
+- OpenCV (opencv-python) — used for accelerated 3D convolution via `cv2.filter2D`
 
 Optional (for visualization):
 - matplotlib (for charts)
@@ -195,7 +196,7 @@ python visualize_stats.py --top-n 15
 
 ## Performance Note
 
-The scratch implementation uses a reference (loop-based) NumPy convolution. It is slower than PyTorch (which uses optimized CUDA/cuDNN). This trade-off enables RISC-V SoC compatibility.
+The scratch implementation uses OpenCV's `cv2.filter2D` for 3D convolution (faster than pure NumPy loops). A fallback slow implementation (`conv3d_forward_slow`) is available in `scratch/ops/conv3d.py` for platforms where OpenCV is not available (e.g. some embedded RISC-V setups)—switch the call in `conv3d_forward()` to use it.
 
 ---
 

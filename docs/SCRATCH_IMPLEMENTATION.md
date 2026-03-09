@@ -1,12 +1,12 @@
 # Scratch 3D CNN Implementation (No PyTorch)
 
-Minimalistic reimplementation of X3D-M layers and model using **NumPy only**, for deployment on systems where PyTorch is not available (e.g. Microchip PolarFire Icicle Kit RISC-V SoC running Ubuntu).
+Minimalistic reimplementation of X3D-M layers and model using **NumPy and OpenCV**, for deployment on systems where PyTorch is not available (e.g. Microchip PolarFire Icicle Kit RISC-V SoC running Ubuntu).
 
 ## Overview
 
 - **Purpose:** Run X3D-M–style 3D CNNs without PyTorch; reuse primitives for other 3D CNN models.
 - **Data layout:** All 3D tensors use `(B, C, T, H, W)` (batch, channels, time, height, width).
-- **Dependencies:** NumPy only (no PyTorch, no scipy).
+- **Dependencies:** NumPy, OpenCV (opencv-python). No PyTorch, no scipy. A pure-NumPy fallback (`conv3d_forward_slow`) is available for platforms without OpenCV.
 
 ## Directory Layout
 
