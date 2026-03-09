@@ -1,0 +1,35 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Sync scratch to Icicle Kit",
+            "type": "shell",
+            "command": "rsync -avz /Users/alanoud/grad_project/x3d/scratch/ ubuntu@192.168.0.2:/home/ubuntu/dev/scratch/",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Sync main to Icicle Kit",
+            "type": "shell",
+            "command": "rsync -avz /Users/alanoud/grad_project/x3d/main.py ubuntu@192.168.0.2:/home/ubuntu/dev/",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Sync weights to Icicle Kit",
+            "type": "shell",
+            "command": "rsync -avz /Users/alanoud/grad_project/x3d/weights/ ubuntu@192.168.0.2:/home/ubuntu/dev/weights/",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        }
+    ]
+}
