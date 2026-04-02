@@ -4,7 +4,7 @@ Conv3d layer (Module with parameters). Replaces torch.nn.Conv3d.
 
 from __future__ import annotations
 import numpy as np
-from typing import Tuple, Union
+from typing import Optional, Tuple, Union
 from scratch.nn.module import Module
 from scratch.ops.conv3d import conv3d_forward
 
@@ -27,6 +27,8 @@ class Conv3d(Module):
         padding: (pt, ph, pw) or int; default 0.
         bias: If True, learn bias.
         groups: 1 = standard conv; in_channels = depthwise.
+        method: Convolution implementation — "slow", "fast", or "threaded".
+                None (default) uses the global default set by set_conv3d_method().
     """
 
     def __init__(
@@ -38,6 +40,7 @@ class Conv3d(Module):
         padding: Union[int, Tuple[int, int, int]] = 0,
         bias: bool = True,
         groups: int = 1,
+        method: Optional[str] = None,
     ) -> None:
         super().__init__()
         self.in_channels = in_channels
@@ -46,9 +49,9 @@ class Conv3d(Module):
         self.stride = _triple(stride)
         self.padding = _triple(padding)
         self.groups = groups
+        self.method = method
         kT, kH, kW = self.kernel_size
         c_per_group = in_channels // groups
-        # weight: (out_channels, in_channels//groups, kT, kH, kW)
         self._parameters["weight"] = np.zeros(
             (out_channels, c_per_group, kT, kH, kW), dtype=np.float32
         )
@@ -73,4 +76,5 @@ class Conv3d(Module):
             self.stride,
             self.padding,
             self.groups,
+            method=self.method,
         )

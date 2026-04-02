@@ -32,6 +32,7 @@ from typing import Optional, Union
 import numpy as np
 from scratch.models.x3d_m import X3D_M
 from scratch.load_weights import load_pretrained_numpy, load_pretrained_numpy_if_available
+from scratch.ops.conv3d import set_conv3d_method, get_conv3d_method, VALID_METHODS
 from scratch.stats import (
     StatsCollector,
     estimate_conv3d_flops,
@@ -453,6 +454,7 @@ def main(
     full_forward: bool = True,
     notes: str = "",
     output_dir: str = "run_stats",
+    method: str = "fast",
 ) -> None:
     """
     Build model, set eval mode, and run inference with optional profiling.
@@ -462,9 +464,13 @@ def main(
         full_forward: Run full forward pass (False = stem only, for quick tests).
         notes: Additional notes to include in the statistics report.
         output_dir: Directory to save statistics files.
+        method: Convolution implementation — "slow", "fast", or "threaded".
     """
+    set_conv3d_method(method)
+
     print("=" * 60)
     print("X3D-M Inference")
+    print(f"Conv3d method: {get_conv3d_method()}")
     print("=" * 60)
 
     weights_path = "weights/x3d_m_kinetics400.npz"
@@ -586,6 +592,18 @@ if __name__ == "__main__":
         default="run_stats",
         help="Directory to save statistics files (default: run_stats)",
     )
+    parser.add_argument(
+        "--method", "-m",
+        type=str,
+        default="fast",
+        choices=list(VALID_METHODS),
+        help=(
+            "Convolution implementation: "
+            '"slow" (pure NumPy), '
+            '"fast" (single-threaded OpenCV, default), '
+            '"threaded" (multi-threaded OpenCV)'
+        ),
+    )
 
     args = parser.parse_args()
     main(
@@ -593,4 +611,5 @@ if __name__ == "__main__":
         full_forward=not args.stem_only,
         notes=args.notes,
         output_dir=args.output_dir,
+        method=args.method,
     )
