@@ -1,7 +1,7 @@
 """
 3D convolution (no PyTorch). Supports standard and depthwise (groups=in_channels).
 
-Three implementation strategies selectable via set_conv3d_method() or per-call:
+Four implementation strategies selectable via set_conv3d_method() or per-call:
 
   "slow"     — Pure NumPy fallback for platforms without OpenCV (e.g. some
                RISC-V embedded systems). No external dependencies beyond NumPy.
@@ -17,10 +17,18 @@ Three implementation strategies selectable via set_conv3d_method() or per-call:
                NumPy and OpenCV release the GIL during C-level computation, so
                Python threads achieve genuine parallelism for these workloads.
 
+  "native"   — C shared-library backend (libconv3d.so) loaded via ctypes.
+               Pthreads parallelism (4 threads), cache-friendly spatial tiling,
+               separate fast paths for pointwise / depthwise / general conv.
+               Build with: make -C scratch/ops/conv3d_c
+               Falls back to RuntimeError if the library has not been compiled.
+
 Default method: "fast"
 """
 
 from __future__ import annotations
+import ctypes
+import os
 import numpy as np
 from typing import Optional, Tuple, Union
 from concurrent.futures import ThreadPoolExecutor
@@ -30,11 +38,59 @@ import cv2
 # Global configuration
 # ---------------------------------------------------------------------------
 
-VALID_METHODS = ("slow", "fast", "threaded")
+VALID_METHODS = ("slow", "fast", "threaded", "native")
 _default_method: str = "fast"
 
 NUM_THREADS = 4  # PolarFire SoC: 4 U54 application cores
 _thread_pool: Optional[ThreadPoolExecutor] = None
+
+# ---------------------------------------------------------------------------
+# C backend (native) — loaded once at import time
+# ---------------------------------------------------------------------------
+
+_c_lib = None
+_c_float_p = ctypes.POINTER(ctypes.c_float)
+
+
+def _load_c_backend() -> None:
+    global _c_lib
+    lib_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "conv3d_c")
+
+    for name in ("libconv3d.so", "libconv3d.dylib"):
+        lib_path = os.path.join(lib_dir, name)
+        if os.path.isfile(lib_path):
+            break
+    else:
+        print("[conv3d] C backend not found — build with:  make -C scratch/ops/conv3d_c")
+        return
+
+    try:
+        _c_lib = ctypes.CDLL(lib_path)
+        _c_lib.conv3d_forward_c.restype = None
+        _c_lib.conv3d_forward_c.argtypes = [
+            _c_float_p,                                     # input
+            _c_float_p,                                     # weight
+            _c_float_p,                                     # bias  (NULL ok)
+            _c_float_p,                                     # output
+            ctypes.c_int, ctypes.c_int,                     # B, C_in
+            ctypes.c_int, ctypes.c_int, ctypes.c_int,       # T, H, W
+            ctypes.c_int,                                   # C_out
+            ctypes.c_int, ctypes.c_int, ctypes.c_int,       # kT, kH, kW
+            ctypes.c_int, ctypes.c_int, ctypes.c_int,       # stride_t/h/w
+            ctypes.c_int, ctypes.c_int, ctypes.c_int,       # pad_t/h/w
+            ctypes.c_int,                                   # groups
+        ]
+        print(f"[conv3d] C backend loaded successfully from {lib_path}")
+    except OSError as e:
+        print(f"[conv3d] C backend load failed: {e}")
+
+
+_load_c_backend()
+
+
+def is_native_available() -> bool:
+    """Return True if the C shared-library backend is loaded."""
+    return _c_lib is not None
 
 
 def _get_thread_pool() -> ThreadPoolExecutor:
@@ -48,7 +104,7 @@ def set_conv3d_method(method: str) -> None:
     """Set the default convolution implementation used by conv3d_forward.
 
     Args:
-        method: One of "slow", "fast", or "threaded".
+        method: One of "slow", "fast", "threaded", or "native".
     """
     global _default_method
     if method not in VALID_METHODS:
@@ -111,7 +167,7 @@ def conv3d_forward(
         stride:  (stride_t, stride_h, stride_w).
         padding: (pad_t, pad_h, pad_w).
         groups:  1 = standard; C_in = depthwise.
-        method:  Override the global default ("slow", "fast", "threaded").
+        method:  Override the global default ("slow", "fast", "threaded", "native").
                  If None, uses the value set by set_conv3d_method().
     """
     if method is None:
@@ -122,6 +178,8 @@ def conv3d_forward(
         return conv3d_forward_fast(x, weight, bias, stride, padding, groups)
     if method == "threaded":
         return conv3d_forward_threaded(x, weight, bias, stride, padding, groups)
+    if method == "native":
+        return conv3d_forward_native(x, weight, bias, stride, padding, groups)
     raise ValueError(
         f"Unknown conv3d method {method!r}; choose from {VALID_METHODS}"
     )
@@ -406,6 +464,59 @@ def _conv3d_core_threaded(volume: np.ndarray, kernel: np.ndarray) -> np.ndarray:
         out_volume[t_start:t_start + local_out.shape[0]] = local_out
 
     return out_volume
+
+
+# ===================================================================
+# METHOD 4: "native" — C shared library via ctypes
+# ===================================================================
+
+def conv3d_forward_native(
+    x: np.ndarray,
+    weight: np.ndarray,
+    bias: Union[np.ndarray, None],
+    stride: Tuple[int, int, int],
+    padding: Tuple[int, int, int],
+    groups: int,
+) -> np.ndarray:
+    """Call the C implementation (libconv3d.so) via ctypes.
+
+    The C library handles zero-padding, pthreads parallelism, and
+    internal dispatch to pointwise / depthwise / general fast paths.
+    """
+    if _c_lib is None:
+        raise RuntimeError(
+            "C backend not available. Build with:  make -C scratch/ops/conv3d_c"
+        )
+
+    x = np.ascontiguousarray(x, dtype=np.float32)
+    weight = np.ascontiguousarray(weight, dtype=np.float32)
+    if bias is not None:
+        bias = np.ascontiguousarray(bias, dtype=np.float32)
+
+    B, C_in, T, H, W = x.shape
+    C_out, _, kT, kH, kW = weight.shape
+    st, sh, sw = stride
+    pt, ph, pw = padding
+
+    T_out = (T + 2 * pt - kT) // st + 1
+    H_out = (H + 2 * ph - kH) // sh + 1
+    W_out = (W + 2 * pw - kW) // sw + 1
+
+    out = np.empty((B, C_out, T_out, H_out, W_out), dtype=np.float32)
+
+    _c_lib.conv3d_forward_c(
+        x.ctypes.data_as(_c_float_p),
+        weight.ctypes.data_as(_c_float_p),
+        bias.ctypes.data_as(_c_float_p) if bias is not None else None,
+        out.ctypes.data_as(_c_float_p),
+        B, C_in, T, H, W,
+        C_out, kT, kH, kW,
+        st, sh, sw,
+        pt, ph, pw,
+        groups,
+    )
+
+    return out
 
 
 # ===================================================================

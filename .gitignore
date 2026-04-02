@@ -44,6 +44,10 @@ weights/*.npz
 .coverage
 htmlcov/
 
+# C backend build artefacts
+scratch/ops/conv3d_c/*.so
+scratch/ops/conv3d_c/*.dylib
+
 # Project-specific
 .claude/
 x3d_m_layers.txt   # generated model inspection output

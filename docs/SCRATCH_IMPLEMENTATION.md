@@ -15,7 +15,11 @@ scratch/
 ├── __init__.py          # Package root; exports Module, X3D_M
 ├── ops/                 # Low-level operations (no learned parameters)
 │   ├── __init__.py
-│   ├── conv3d.py        # 3D convolution (standard + depthwise)
+│   ├── conv3d.py        # 3D convolution (slow/fast/threaded/native)
+│   ├── conv3d_c/        # C shared-library backend (pthreads, tiling)
+│   │   ├── conv3d.c     # C implementation for RISC-V (RV64GC)
+│   │   ├── conv3d.h     # Header
+│   │   └── Makefile     # Build targets: auto-detect, riscv, native
 │   ├── batchnorm3d.py   # 3D batch normalization
 │   ├── activations.py   # ReLU, SiLU, Sigmoid
 │   ├── pooling.py      # AvgPool3d, AdaptiveAvgPool3d
@@ -74,7 +78,8 @@ from scratch.ops import relu, silu, sigmoid, avg_pool3d_forward
 
 ### Ops (no parameters)
 
-- **`conv3d_forward(x, weight, bias, stride, padding, groups)`** – 3D conv; `bias` can be `None`; `groups=in_channels` for depthwise.
+- **`conv3d_forward(x, weight, bias, stride, padding, groups, method=None)`** – 3D conv; `bias` can be `None`; `groups=in_channels` for depthwise. `method` selects implementation: `"slow"`, `"fast"` (default), `"threaded"`, or `"native"` (C backend).
+- **`set_conv3d_method(method)`** – Set global default method. **`get_conv3d_method()`** – Query it. **`is_native_available()`** – Check if C backend loaded.
 - **`batchnorm3d_forward(x, weight, bias, running_mean, running_var, eps, training, momentum)`** – BN over (B,T,H,W) per channel.
 - **`relu(x)`**, **`silu(x)`**, **`sigmoid(x)`** – Element-wise activations.
 - **`avg_pool3d_forward(x, kernel_size, stride=None)`** – 3D average pooling.
@@ -84,7 +89,7 @@ from scratch.ops import relu, silu, sigmoid, avg_pool3d_forward
 
 ### NN layers (with parameters)
 
-- **`Conv3d(in_channels, out_channels, kernel_size, stride=1, padding=0, bias=True, groups=1)`** – 3D conv layer; `forward(x)`.
+- **`Conv3d(in_channels, out_channels, kernel_size, stride=1, padding=0, bias=True, groups=1, method=None)`** – 3D conv layer; `forward(x)`. `method` overrides the global default for this layer.
 - **`BatchNorm3d(num_features, eps=1e-5, momentum=0.1)`** – 3D BN; uses running mean/var in eval.
 - **`Sequential(*modules)`**, **`ModuleList(modules)`** – Sequential chain and list of modules.
 - **`SqueezeExcitation(channels, se_ratio=0.0625)`** – SE block (global pool → 1×1×1 convs → scale).
@@ -163,5 +168,5 @@ The loader in `scratch/load_weights.py` uses only NumPy: it opens the .npz, walk
 ## Notes
 
 - **Inference:** Call `model.eval()` so BatchNorm uses running statistics and Dropout is disabled.
-- **Performance:** The current conv3d and pooling implementations use simple loops and are aimed at correctness and portability; they can be slow on large inputs (e.g. one stem forward at 224×224 may take tens of seconds). For production on RISC-V, replace the core loops in `scratch/ops/conv3d.py` and `scratch/ops/pooling.py` with optimized C/assembly or FPGA-offloaded kernels while keeping the same Python API and `scratch` layout.
+- **Performance:** Four convolution implementations are available — `"slow"` (pure NumPy), `"fast"` (OpenCV, default), `"threaded"` (multi-threaded OpenCV), and `"native"` (C shared library with pthreads and tiling). For RISC-V deployment, build the C backend with `make -C scratch/ops/conv3d_c riscv` and set `set_conv3d_method("native")` or use `--method native` on the CLI. The C backend eliminates Python interpreter overhead and uses cache-friendly spatial tiling tuned for the U54's 32 KiB L1.
 - **Numerics:** Same formulas as the PyTorch reference (BN eps=1e-5, momentum=0.1; same strides/padding). For exact parity you would need to load the same weights and use the same floating-point behavior.

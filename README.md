@@ -13,6 +13,7 @@ X3D-M (eXpand-3D Medium) video classification model built from scratch using **N
 - Python 3.8+
 - NumPy
 - OpenCV (opencv-python) — used for accelerated 3D convolution via `cv2.filter2D`
+- GCC (for building the optional C backend — `scratch/ops/conv3d_c/`)
 
 Optional (for visualization):
 - matplotlib (for charts)
@@ -48,6 +49,10 @@ x3d/
 │   ├── models/         # X3D-M model definition
 │   ├── nn/             # Neural network layers (Conv3d, BatchNorm, etc.)
 │   ├── ops/            # Low-level operations (conv3d, pooling, etc.)
+│   │   └── conv3d_c/   # C shared-library backend (pthreads, tiling)
+│   │       ├── conv3d.c
+│   │       ├── conv3d.h
+│   │       └── Makefile
 │   ├── load_weights.py # Load .npz weights into model
 │   └── stats.py        # Profiling and statistics collection
 ├── scripts/
@@ -194,9 +199,48 @@ python visualize_stats.py --top-n 15
 
 ---
 
-## Performance Note
+## Convolution Methods
 
-The scratch implementation uses OpenCV's `cv2.filter2D` for 3D convolution (faster than pure NumPy loops). A fallback slow implementation (`conv3d_forward_slow`) is available in `scratch/ops/conv3d.py` for platforms where OpenCV is not available (e.g. some embedded RISC-V setups)—switch the call in `conv3d_forward()` to use it.
+Four implementations are available, selectable via `--method` flag or `set_conv3d_method()`:
+
+| Method | Description |
+|--------|-------------|
+| `slow` | Pure NumPy fallback (no OpenCV needed) |
+| `fast` | Single-threaded OpenCV `cv2.filter2D` **(default)** |
+| `threaded` | Multi-threaded OpenCV (4 Python threads, adaptive parallelism) |
+| `native` | C shared library via ctypes (pthreads, spatial tiling, fast paths) |
+
+### CLI usage
+
+```bash
+python main.py --method fast              # default
+python main.py --method threaded          # Python multi-threaded
+python main.py --method native --profile  # C backend
+```
+
+### Python usage
+
+```python
+from scratch import set_conv3d_method
+set_conv3d_method("native")   # use C backend for all subsequent calls
+```
+
+### Building the C backend (native)
+
+```bash
+# Auto-detect architecture (RISC-V, x86_64, or ARM)
+make -C scratch/ops/conv3d_c
+
+# Explicit RISC-V target (on the PolarFire SoC or cross-compile)
+make -C scratch/ops/conv3d_c riscv
+
+# Explicit x86 native target (for testing on dev machine)
+make -C scratch/ops/conv3d_c native
+```
+
+The C backend uses pthreads (4 threads for the PolarFire SoC's 4 U54 cores), cache-friendly spatial tiling for the 32 KiB L1, and separate fast paths for pointwise (1×1×1), depthwise, and general convolutions. It targets RV64GC (no vector extension) with `-O3 -funroll-loops -ffast-math`.
+
+If `libconv3d.so` is not compiled, a message is printed at import time and `set_conv3d_method("native")` will raise a clear error.
 
 ---
 

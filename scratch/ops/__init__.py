@@ -5,6 +5,7 @@ from scratch.ops.conv3d import (
     set_conv3d_method,
     get_conv3d_method,
     set_num_threads,
+    is_native_available,
     VALID_METHODS,
 )
 from scratch.ops.batchnorm3d import batchnorm3d_forward
@@ -18,6 +19,7 @@ __all__ = [
     "set_conv3d_method",
     "get_conv3d_method",
     "set_num_threads",
+    "is_native_available",
     "VALID_METHODS",
     "batchnorm3d_forward",
     "relu",

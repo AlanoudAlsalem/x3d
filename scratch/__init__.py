@@ -19,7 +19,10 @@ Convolution method selection:
 from scratch.nn.module import Module
 from scratch.models.x3d_m import X3D_M
 from scratch.load_weights import load_pretrained_numpy, load_pretrained_numpy_if_available
-from scratch.ops.conv3d import set_conv3d_method, get_conv3d_method, set_num_threads, VALID_METHODS
+from scratch.ops.conv3d import (
+    set_conv3d_method, get_conv3d_method, set_num_threads,
+    is_native_available, VALID_METHODS,
+)
 
 __all__ = [
     "Module",
@@ -29,5 +32,6 @@ __all__ = [
     "set_conv3d_method",
     "get_conv3d_method",
     "set_num_threads",
+    "is_native_available",
     "VALID_METHODS",
 ]
