@@ -49,12 +49,19 @@ x3d/
 │   ├── models/         # X3D-M model definition
 │   ├── nn/             # Neural network layers (Conv3d, BatchNorm, etc.)
 │   ├── ops/            # Low-level operations (conv3d, pooling, etc.)
-│   │   └── conv3d_c/   # C shared-library backend (pthreads, tiling)
-│   │       ├── conv3d.c
-│   │       ├── conv3d.h
-│   │       └── Makefile
+│   │   ├── conv3d_c/   # Float32 C backend (pthreads, tiling)
+│   │   ├── conv3d_fpga_c/  # Int8 FPGA-offload C backend
+│   │   │   ├── conv3d_fpga.c
+│   │   │   ├── conv3d_fpga.h
+│   │   │   └── Makefile
+│   │   └── conv3d_fpga.py  # Python ctypes wrapper for FPGA backend
 │   ├── load_weights.py # Load .npz weights into model
 │   └── stats.py        # Profiling and statistics collection
+├── fpga_tests/          # Per-layer FPGA offload validation
+│   ├── test_layer.py   # CLI: runs float, SW-int8, Sim, and HW paths
+│   ├── kernels.py      # sw_int8, fpga_sim, fpga_hw conv implementations
+│   ├── quant.py        # Int8 quantization / requantization primitives
+│   └── layer_configs.py # Conv layer specs for all X3D-M conv types
 ├── scripts/
 │   └── convert_pytorch_weights_to_numpy.py  # Convert PyTorch weights to .npz
 ├── weights/            # Model weights (.npz) — not in repo
@@ -241,6 +248,58 @@ make -C scratch/ops/conv3d_c native
 The C backend uses pthreads (4 threads for the PolarFire SoC's 4 U54 cores), cache-friendly spatial tiling for the 32 KiB L1, and separate fast paths for pointwise (1×1×1), depthwise, and general convolutions. It targets RV64GC (no vector extension) with `-O3 -funroll-loops -ffast-math`.
 
 If `libconv3d.so` is not compiled, a message is printed at import time and `set_conv3d_method("native")` will raise a clear error.
+
+---
+
+## FPGA Offload (Int8 Convolution)
+
+The FPGA offload path moves 3D convolutions off the RISC-V CPU and onto the
+PolarFire FPGA fabric using **int8 arithmetic** — the same datapath the real
+hardware accelerator will use.
+
+### Architecture
+
+The int8 pipeline has three implementations with a **unified API** so they can be compared directly:
+
+| Implementation | Where it runs | Arithmetic | Requantization | Purpose |
+|---|---|---|---|---|
+| `sw_int8_conv3d` | CPU (Python) | float32→int32 | float `M[c]` | Gold-standard reference |
+| `fpga_sim_int8_conv3d` | CPU (Python) | float32→int32 | fixed-point `(M0, n)` | Python FPGA simulator |
+| `fpga_hw_int8_conv3d` | CPU (C lib) | **int8→int32** | fixed-point `(M0, n)` | **FPGA offload backend** |
+
+All three accept the same signature: `(x_q, W_q, <requant_params>, stride, padding, groups) -> int8`.
+
+The C backend (`scratch/ops/conv3d_fpga_c/`) mirrors the float32 C backend's
+structure — pthreads (4 threads), spatial tiling, pointwise/depthwise/general
+fast paths — but operates entirely in int8/int32.
+
+### Building the FPGA C backend
+
+```bash
+make -C scratch/ops/conv3d_fpga_c            # auto-detect architecture
+make -C scratch/ops/conv3d_fpga_c riscv      # RISC-V target
+make -C scratch/ops/conv3d_fpga_c native     # x86 target (dev machine testing)
+```
+
+### Per-layer validation
+
+```bash
+# Run all four paths (float, SW-int8, FPGA-sim, FPGA-HW) for conv_b
+python -m fpga_tests.test_layer
+
+# Test other conv types
+python -m fpga_tests.test_layer --layer conv_a
+python -m fpga_tests.test_layer --layer conv_t --seed 7
+
+# Skip FPGA HW if C backend not compiled
+python -m fpga_tests.test_layer --skip-fpga-hw
+```
+
+The test validates that:
+- **Sim vs SW** int8 disagreement ≤ 2 LSB (float-vs-fixed-point rounding)
+- **HW vs Sim** produces **bit-identical** output (same requantization logic)
+
+See `fpga_tests/README.md` for full details.
 
 ---
 

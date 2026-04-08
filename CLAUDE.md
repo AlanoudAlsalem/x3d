@@ -70,7 +70,9 @@ x3d/
 │   ├── __init__.py          # Public API: X3D_M, set_conv3d_method, etc.
 │   ├── ops/                 # Stateless math operations
 │   │   ├── conv3d.py        # 4 conv methods + threading helpers
-│   │   ├── conv3d_c/        # C backend (conv3d.c, conv3d.h, Makefile)
+│   │   ├── conv3d_c/        # Float32 C backend (conv3d.c, conv3d.h, Makefile)
+│   │   ├── conv3d_fpga_c/   # Int8 FPGA-offload C backend (conv3d_fpga.c/.h, Makefile)
+│   │   ├── conv3d_fpga.py   # Python ctypes wrapper for FPGA int8 C backend
 │   │   ├── batchnorm3d.py
 │   │   ├── activations.py   # relu, silu, sigmoid
 │   │   ├── pooling.py       # avg_pool3d, adaptive_avg_pool3d
@@ -93,6 +95,12 @@ x3d/
 ├── scripts/
 │   └── convert_pytorch_weights_to_numpy.py  # PyTorch → .npz (run on dev machine)
 ├── weights/                 # .npz files (gitignored, large)
+├── fpga_tests/              # Per-layer FPGA offload validation
+│   ├── test_layer.py        # CLI: float, SW-int8, FPGA-sim, FPGA-HW
+│   ├── kernels.py           # sw_int8, fpga_sim, fpga_hw conv kernels
+│   ├── quant.py             # Int8 quantization / requantization
+│   ├── layer_configs.py     # Conv layer specs for all X3D-M conv types
+│   └── runs/                # Output tensors + JSON summaries (gitignored)
 ├── run_stats/               # Profiling JSON/TXT output (gitignored)
 ├── archive/                 # Legacy C++/PyTorch code (not used)
 └── DOCUMENTATION.md         # Comprehensive technical documentation
@@ -115,11 +123,19 @@ python main.py --profile --output-dir my_stats
 python main.py --method fast              # default (multi-threaded OpenCV)
 python main.py --method native --profile  # C backend
 
-# Build C backend
-make -C scratch/ops/conv3d_c              # auto-detect
+# Build C backends
+make -C scratch/ops/conv3d_c              # float32 backend (auto-detect)
 make -C scratch/ops/conv3d_c riscv        # RISC-V target
 make -C scratch/ops/conv3d_c native       # x86 native
-make -C scratch/ops/conv3d_c clean
+make -C scratch/ops/conv3d_fpga_c         # int8 FPGA-offload backend (auto-detect)
+make -C scratch/ops/conv3d_fpga_c riscv   # RISC-V target
+make -C scratch/ops/conv3d_fpga_c native  # x86 native
+
+# FPGA per-layer validation
+python -m fpga_tests.test_layer                     # default: conv_b
+python -m fpga_tests.test_layer --layer conv_a      # pointwise
+python -m fpga_tests.test_layer --layer conv_t      # general (stem spatial)
+python -m fpga_tests.test_layer --skip-fpga-hw      # skip C backend path
 
 # Weight conversion (requires PyTorch on dev machine)
 python scripts/convert_pytorch_weights_to_numpy.py -o weights/x3d_m_kinetics400.npz

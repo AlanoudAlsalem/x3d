@@ -49,6 +49,9 @@ htmlcov/
 scratch/ops/conv3d_c/*.so
 scratch/ops/conv3d_c/*.dylib
 scratch/ops/conv3d_c/*.o
+scratch/ops/conv3d_fpga_c/*.so
+scratch/ops/conv3d_fpga_c/*.dylib
+scratch/ops/conv3d_fpga_c/*.o
 
 # FPGA test run outputs (large binary data; regenerate via fpga_tests/test_layer.py)
 fpga_tests/runs/*.npz
