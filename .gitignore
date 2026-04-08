@@ -5,6 +5,7 @@ __pycache__/
 
 # Virtual environments
 .venv/
+.venv-dashboard/
 venv/
 env/
 ENV/
@@ -47,8 +48,17 @@ htmlcov/
 # C backend build artefacts
 scratch/ops/conv3d_c/*.so
 scratch/ops/conv3d_c/*.dylib
+scratch/ops/conv3d_c/*.o
+
+# FPGA test run outputs (large binary data; regenerate via fpga_tests/test_layer.py)
+fpga_tests/runs/*.npz
+fpga_tests/runs/*.json
+
+# Scratch / untitled files
+Untitled.md
 
 # Project-specific
 .claude/
+.obsidian/
 x3d_m_layers.txt   # generated model inspection output
 videos/            # test video files

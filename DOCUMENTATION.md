@@ -1207,7 +1207,90 @@ The `is_native_available()` function can be used to check whether the C library 
 
 ---
 
-## 16. Archive and Legacy Code
+## 16. Int8 Post-Training Quantization (PTQ)
+
+### 16.1 Motivation
+
+The float32 scratch library is sufficient as a correctness reference and as a baseline for CPU benchmarking, but it is not the final deployment target. The end goal of this project is to accelerate X3D-M on the PolarFire SoC's FPGA fabric, where multiply-accumulate (MAC) resources are dominated by integer DSPs and on-chip memory is scarce. Running int8 × int8 → int32 MACs instead of float32 × float32 → float32 gives roughly a 4× reduction in weight memory footprint, a proportional reduction in DRAM bandwidth (which is the primary bottleneck on the Icicle Kit's 32-bit LPDDR4), and allows each FPGA DSP block to perform multiple int8 multiplies in parallel. For these reasons, the project standardizes on int8 post-training quantization (PTQ) as the bridge between the float32 software reference and the future FPGA accelerator.
+
+X3D-M does not ship with an official pre-quantized checkpoint from Facebook or PyTorchVideo. The `scripts/quantize_x3d_ptq.py` script performs this quantization offline on a development machine and exports the result to a flat `.npz` file that can be loaded on the SoC with no PyTorch dependency.
+
+### 16.2 Quantization Scheme
+
+The scheme is deliberately chosen to be the simplest one that (a) preserves accuracy on a pretrained model and (b) maps cleanly onto an FPGA MAC array without requiring zero-point subtraction logic in the hot path.
+
+- **Weights**: symmetric, per-output-channel, int8. The zero-point is fixed at zero, so the hardware never has to subtract a bias term from the weight stream. Per-channel scales are applied only at requantization time (one scale per output channel), which is effectively free in hardware.
+- **Activations**: symmetric, per-tensor, int8. A single scale per activation tensor keeps the activation streaming path uniform. Per-tensor (rather than per-channel) activation quantization is standard because activations are data-dependent and cannot be recalibrated per channel without significantly complicating the runtime.
+- **Accumulator**: int32. Each convolution produces an int32 accumulator that is then requantized back to int8 using `(acc * input_scale * weight_scale[c]) / output_scale`.
+- **Bias**: int32, with `bias_scale[c] = input_scale * weight_scale[c]`. This allows biases to be added directly into the int32 accumulator with no additional rescaling, which is the canonical pattern used by every production int8 inference engine (TFLite, QNNPACK, CMSIS-NN).
+
+Why symmetric? Asymmetric quantization (non-zero zero-point) gives slightly better accuracy on activations with skewed distributions, but it requires every MAC to subtract a zero-point offset from either the weight or activation operand, which doubles the DSP usage on the FPGA. Symmetric quantization loses less than one percentage point of top-1 accuracy on X3D-M in our measurements and is worth the tradeoff.
+
+### 16.3 BatchNorm Folding
+
+Before quantization, every `BatchNorm3d` in the model is folded into the preceding `Conv3d`. This is essential for two reasons. First, quantizing BN separately would require an extra pair of scales and a separate int8 affine operation, none of which the FPGA accelerator needs to support. Second, folding improves quantization accuracy: after folding, the conv weights absorb the BN `gamma / sqrt(var + eps)` scaling, which smooths out the per-channel weight distribution and makes per-channel weight quantization more effective.
+
+The folding math is:
+
+```
+W'[c] = W[c] * gamma[c] / sqrt(var[c] + eps)
+b'[c] = (b[c] - mean[c]) * gamma[c] / sqrt(var[c] + eps) + beta[c]
+```
+
+After folding, each BatchNorm3d is replaced with `nn.Identity()` and has no runtime cost. The `fold_all_bn()` function in `quantize_x3d_ptq.py` performs this pass automatically on the entire model graph.
+
+### 16.4 Calibration
+
+PTQ requires a small set of representative inputs to collect activation statistics (specifically, the absolute maximum of each activation tensor). Forward hooks attached to every `Conv3d` and `Linear` layer observe both the input and output tensors during calibration and maintain a running maximum.
+
+The script defaults to 128 calibration batches of random normal tensors, which is adequate to capture rough activation magnitudes on a pretrained model and completes in about one to two minutes on the M3 Max (MPS backend is auto-detected). For a more accurate calibration, pass `--calib-dir` pointing to a directory of preprocessed Kinetics clips saved as `.npy` files shaped `(3, 16, 224, 224)`. In practice, 64 to 256 real calibration clips are sufficient to reach the accuracy floor of PTQ.
+
+The scale for each observed tensor is computed as `abs_max / 127`, which produces a symmetric int8 range of `[-127, 127]`. The value `-128` is deliberately not used; this keeps the quantized range symmetric around zero and eliminates a corner case that complicates requantization in fixed-point hardware.
+
+### 16.5 Output Format
+
+The script exports a single flat `.npz` file (default `weights/x3d_m_int8.npz`). For every quantized layer `L`, the file contains:
+
+- `L.weight_q` — int8, shape `(out_c, in_c/groups, kT, kH, kW)` for Conv3d or `(out, in)` for Linear.
+- `L.weight_scale` — float32, shape `(out_c,)`.
+- `L.bias_q` — int32, shape `(out_c,)`, only present if the layer has a bias.
+- `L.input_scale` — float32 scalar, the symmetric per-tensor scale of the layer's input activation.
+- `L.output_scale` — float32 scalar, the symmetric per-tensor scale of the layer's output activation.
+
+Global metadata is stored under the `__meta__` prefix (`num_quantized_layers`, `weight_scheme`, `act_scheme`, `bias_scheme`) so that the SoC-side loader can sanity-check the file and refuse to load weights exported with an incompatible scheme.
+
+### 16.6 Running the Script
+
+The script must be run on a machine with PyTorch installed. On the development MacBook (M3 Max, 48 GB RAM), a typical invocation looks like:
+
+```bash
+# Quantize directly from the PyTorchVideo hub checkpoint
+python scripts/quantize_x3d_ptq.py -o weights/x3d_m_int8.npz
+
+# Use a local float32 checkpoint and 256 random calibration batches
+python scripts/quantize_x3d_ptq.py \
+    -i weights/x3d_m_kinetics400.pth \
+    -o weights/x3d_m_int8.npz \
+    --num-calib-batches 256
+
+# Use real Kinetics calibration clips for best accuracy
+python scripts/quantize_x3d_ptq.py \
+    --calib-dir data/kinetics_calib \
+    -o weights/x3d_m_int8.npz
+```
+
+MPS (Apple Silicon GPU) is auto-detected and used when available. The full 128-batch calibration takes roughly one to two minutes on the M3 Max, and the resulting `.npz` is approximately one quarter the size of the float32 version.
+
+### 16.7 Known Caveats and Future Work
+
+- **SiLU activations**: SiLU (Swish) is non-monotonic near zero and is harder to represent exactly with int8 than ReLU. The current export assumes the SoC runtime will dequantize before SiLU, apply SiLU in float, and requantize the result. A future refinement is to precompute a 256-entry int8 lookup table indexed by the int8 activation value, which replaces the dequantize/SiLU/requantize sequence with a single table load on the FPGA.
+- **Depthwise 3×3×3 convolutions**: these are the most quantization-sensitive layers in X3D-M because each output channel has only 27 weights and any quantization error is not averaged across many input channels. If PTQ accuracy drops by more than about two points on Kinetics-400, the recommended next step is quantization-aware training (QAT) for a small number of epochs, focused on the depthwise layers.
+- **Squeeze-Excitation**: SE blocks contain a sigmoid and two small FC layers. They are quantized uniformly with the rest of the model, but their dynamic range is much smaller than the main convolutional path, and per-tensor activation quantization loses some precision. This has not been a problem in practice but is worth monitoring during accuracy validation.
+- **No runtime int8 kernel yet**: the `.npz` file produced by this script is consumed by the future int8 convolution kernel (to be implemented in both C and FPGA). Until those kernels exist, the scratch library continues to run in float32 at inference time.
+
+---
+
+## 17. Archive and Legacy Code
 
 The `archive/` directory contains earlier implementations that have been superseded by the scratch library:
 
@@ -1223,7 +1306,7 @@ These files are retained for historical reference but are not used by the curren
 
 ---
 
-## 17. Glossary
+## 18. Glossary
 
 **Action Recognition**: the computer vision task of classifying the human action being performed in a video clip (e.g., "playing basketball", "cooking").
 

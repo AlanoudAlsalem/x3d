@@ -1,4 +1,4 @@
-/*
+ /*
  * conv3d.c — Multithreaded 3D convolution for RISC-V PolarFire SoC
  *
  * Targets the 4× U54 application cores (RV64GC, NO vector extension).
