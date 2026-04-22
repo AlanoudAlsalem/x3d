@@ -1,0 +1,9542 @@
+{
+  "run_id": "20260414_105339_606179",
+  "timestamp": "2026-04-14T10:53:39.606538",
+  "platform_info": {
+    "platform": "Linux-6.1.74-linux4microchip+fpga-2024.02-riscv64-with-glibc2.35",
+    "system": "Linux",
+    "machine": "riscv64",
+    "processor": "riscv64",
+    "python_version": "3.10.13",
+    "node": "mpfs-icicle-kit-prod",
+    "cpu_count_logical": 4,
+    "psutil_available": false,
+    "device_type": "PolarFire SoC Icicle Kit"
+  },
+  "model_name": "X3D-M",
+  "input_shape": [
+    1,
+    3,
+    16,
+    224,
+    224
+  ],
+  "total_latency_ms": 173193.98952899995,
+  "total_params": 3794274,
+  "total_flops": 9464937472,
+  "layers": [
+    {
+      "name": "Stem.conv.conv_t",
+      "layer_type": "Conv3d",
+      "input_shape": [
+        1,
+        3,
+        16,
+        224,
+        224
+      ],
+      "output_shape": [
+        1,
+        24,
+        16,
+        112,
+        112
+      ],
+      "latency_ms": 3838.7818759999845,
+      "params": 648,
+      "flops": 260112384,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          2,
+          2
+        ],
+        "groups": 1
+      }
+    },
+    {
+      "name": "Stem.conv.conv_xy",
+      "layer_type": "Conv3d (depthwise)",
+      "input_shape": [
+        1,
+        24,
+        16,
+        112,
+        112
+      ],
+      "output_shape": [
+        1,
+        24,
+        16,
+        112,
+        112
+      ],
+      "latency_ms": 1298.6446200000046,
+      "params": 120,
+      "flops": 48168960,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          5,
+          1,
+          1
+        ],
+        "stride": 1,
+        "groups": 24
+      }
+    },
+    {
+      "name": "Stem.norm",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        24,
+        16,
+        112,
+        112
+      ],
+      "output_shape": [
+        1,
+        24,
+        16,
+        112,
+        112
+      ],
+      "latency_ms": 1326.1786120000352,
+      "params": 48,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stem.relu",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        24,
+        16,
+        112,
+        112
+      ],
+      "output_shape": [
+        1,
+        24,
+        16,
+        112,
+        112
+      ],
+      "latency_ms": 344.9658990000444,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block0.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        24,
+        16,
+        112,
+        112
+      ],
+      "output_shape": [
+        1,
+        54,
+        16,
+        112,
+        112
+      ],
+      "latency_ms": 10122.726052000075,
+      "params": 1296,
+      "flops": 520224768,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage2.block0.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        54,
+        16,
+        112,
+        112
+      ],
+      "output_shape": [
+        1,
+        54,
+        16,
+        112,
+        112
+      ],
+      "latency_ms": 3215.1360660000137,
+      "params": 108,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block0.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        54,
+        16,
+        112,
+        112
+      ],
+      "output_shape": [
+        1,
+        54,
+        16,
+        112,
+        112
+      ],
+      "latency_ms": 787.9967719999286,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block0.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        54,
+        16,
+        112,
+        112
+      ],
+      "output_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 1800.3044789999194,
+      "params": 1458,
+      "flops": 146313216,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          2,
+          2
+        ],
+        "groups": 54
+      }
+    },
+    {
+      "name": "Stage2.block0.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 763.2947790000344,
+      "params": 108,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block0.norm_b.se.squeeze",
+      "layer_type": "AdaptiveAvgPool3d",
+      "input_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        54,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 61.64298199996665,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {
+        "output_size": 1
+      }
+    },
+    {
+      "name": "Stage2.block0.norm_b.se.conv1",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        54,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        8,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.6909999999370484,
+      "params": 440,
+      "flops": 864,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block0.norm_b.se.relu",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        8,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        8,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.1659999999219508,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block0.norm_b.se.conv2",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        8,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        54,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.5319999999974243,
+      "params": 486,
+      "flops": 864,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block0.norm_b.se.sigmoid",
+      "layer_type": "Sigmoid",
+      "input_shape": [
+        1,
+        54,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        54,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.738999000077456,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block0.norm_b.se.scale",
+      "layer_type": "Mul (element-wise)",
+      "input_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 149.35395700001663,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block0.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 1346.878609999976,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block0.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 2586.8302510000376,
+      "params": 1296,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage2.block0.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 331.8599039999981,
+      "params": 48,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block0.branch1_conv",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        24,
+        16,
+        112,
+        112
+      ],
+      "output_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 1418.4865899999295,
+      "params": 576,
+      "flops": 57802752,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ],
+        "stride": [
+          1,
+          2,
+          2
+        ]
+      }
+    },
+    {
+      "name": "Stage2.block0.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 89.31197399999746,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block0.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 80.72397700004785,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block1.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 2554.3352629999845,
+      "params": 1296,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage2.block1.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 755.2527819999568,
+      "params": 108,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block1.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 174.62795000005826,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block1.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 1652.8335230000266,
+      "params": 1458,
+      "flops": 146313216,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          1,
+          1
+        ],
+        "groups": 54
+      }
+    },
+    {
+      "name": "Stage2.block1.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 706.7667960000108,
+      "params": 108,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block1.norm_b.identity",
+      "layer_type": "Identity",
+      "input_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 0.0390000000152213,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block1.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 1342.5926129999652,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block1.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 2547.802266999952,
+      "params": 1296,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage2.block1.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 314.67791000000034,
+      "params": 48,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block1.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 85.9749759999886,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block1.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 82.29597699994429,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block2.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 2607.0782499999723,
+      "params": 1296,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage2.block2.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 761.6727810000157,
+      "params": 108,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block2.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 196.08394400006546,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block2.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 1663.7625219999563,
+      "params": 1458,
+      "flops": 146313216,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          1,
+          1
+        ],
+        "groups": 54
+      }
+    },
+    {
+      "name": "Stage2.block2.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 747.6047850000214,
+      "params": 108,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block2.norm_b.se.squeeze",
+      "layer_type": "AdaptiveAvgPool3d",
+      "input_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        54,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 61.247982000054435,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {
+        "output_size": 1
+      }
+    },
+    {
+      "name": "Stage2.block2.norm_b.se.conv1",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        54,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        8,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.8220000000610526,
+      "params": 440,
+      "flops": 864,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block2.norm_b.se.relu",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        8,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        8,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.1720000000204891,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block2.norm_b.se.conv2",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        8,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        54,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.464000000055421,
+      "params": 486,
+      "flops": 864,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block2.norm_b.se.sigmoid",
+      "layer_type": "Sigmoid",
+      "input_shape": [
+        1,
+        54,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        54,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.4799999999249849,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block2.norm_b.se.scale",
+      "layer_type": "Mul (element-wise)",
+      "input_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 149.28295799995794,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block2.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 1351.2886120000758,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block2.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        54,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 2576.081261000013,
+      "params": 1296,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage2.block2.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 342.5059019999708,
+      "params": 48,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block2.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 86.24697499999456,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage2.block2.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 81.9309759999669,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block0.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 5102.483537000012,
+      "params": 2592,
+      "flops": 260112384,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage3.block0.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        108,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 1562.623551999991,
+      "params": 216,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block0.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        108,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        56,
+        56
+      ],
+      "latency_ms": 348.3008999999129,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block0.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        108,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 889.0497449999657,
+      "params": 2916,
+      "flops": 73156608,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          2,
+          2
+        ],
+        "groups": 108
+      }
+    },
+    {
+      "name": "Stage3.block0.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 382.68389100005606,
+      "params": 216,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block0.norm_b.se.squeeze",
+      "layer_type": "AdaptiveAvgPool3d",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 31.739990999994916,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {
+        "output_size": 1
+      }
+    },
+    {
+      "name": "Stage3.block0.norm_b.se.conv1",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        108,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        8,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.8209999999498905,
+      "params": 872,
+      "flops": 1728,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block0.norm_b.se.relu",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        8,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        8,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.1700000000255386,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block0.norm_b.se.conv2",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        8,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        108,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.5379999999822758,
+      "params": 972,
+      "flops": 1728,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block0.norm_b.se.sigmoid",
+      "layer_type": "Sigmoid",
+      "input_shape": [
+        1,
+        108,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        108,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.5800000000135697,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block0.norm_b.se.scale",
+      "layer_type": "Mul (element-wise)",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 73.34097899990866,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block0.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 676.0388070000545,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block0.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 2520.665278000024,
+      "params": 5184,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage3.block0.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 158.1079549999913,
+      "params": 96,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block0.branch1_conv",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        24,
+        16,
+        56,
+        56
+      ],
+      "output_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 707.8007970000044,
+      "params": 1152,
+      "flops": 28901376,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ],
+        "stride": [
+          1,
+          2,
+          2
+        ]
+      }
+    },
+    {
+      "name": "Stage3.block0.branch1_norm",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 157.4209550000205,
+      "params": 96,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block0.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 43.06798699997216,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block0.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 41.082988999960435,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block1.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 2027.711421000049,
+      "params": 5184,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage3.block1.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 357.7838979999797,
+      "params": 216,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block1.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 90.05097399995066,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block1.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 813.9457669999501,
+      "params": 2916,
+      "flops": 73156608,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          1,
+          1
+        ],
+        "groups": 108
+      }
+    },
+    {
+      "name": "Stage3.block1.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 352.694898999971,
+      "params": 216,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block1.norm_b.identity",
+      "layer_type": "Identity",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 0.0390000000152213,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block1.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 677.9558059999999,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block1.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 2586.6052609999315,
+      "params": 5184,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage3.block1.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 157.3739550000255,
+      "params": 96,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block1.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 43.31998800000747,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block1.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 41.24498900000617,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block2.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 2062.7344120000544,
+      "params": 5184,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage3.block2.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 357.58489800002735,
+      "params": 216,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block2.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 87.06097499998577,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block2.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 813.5877680000476,
+      "params": 2916,
+      "flops": 73156608,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          1,
+          1
+        ],
+        "groups": 108
+      }
+    },
+    {
+      "name": "Stage3.block2.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 360.60989700001755,
+      "params": 216,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block2.norm_b.se.squeeze",
+      "layer_type": "AdaptiveAvgPool3d",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 31.814990000043508,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {
+        "output_size": 1
+      }
+    },
+    {
+      "name": "Stage3.block2.norm_b.se.conv1",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        108,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        8,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.8710000000510263,
+      "params": 872,
+      "flops": 1728,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block2.norm_b.se.relu",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        8,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        8,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.1700000000255386,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block2.norm_b.se.conv2",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        8,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        108,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.4380000000073778,
+      "params": 972,
+      "flops": 1728,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block2.norm_b.se.sigmoid",
+      "layer_type": "Sigmoid",
+      "input_shape": [
+        1,
+        108,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        108,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.5109999999604042,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block2.norm_b.se.scale",
+      "layer_type": "Mul (element-wise)",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 75.51897799999097,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block2.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 676.9958070000257,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block2.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 2515.1112820000208,
+      "params": 5184,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage3.block2.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 157.4419549999675,
+      "params": 96,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block2.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 43.41098800000509,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block2.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 41.264988999955676,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block3.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 2013.523426000006,
+      "params": 5184,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage3.block3.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 356.36389900002996,
+      "params": 216,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block3.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 89.28197499994894,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block3.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 813.6287680000578,
+      "params": 2916,
+      "flops": 73156608,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          1,
+          1
+        ],
+        "groups": 108
+      }
+    },
+    {
+      "name": "Stage3.block3.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 357.6188979999415,
+      "params": 216,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block3.norm_b.identity",
+      "layer_type": "Identity",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 0.0390000000152213,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block3.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 677.0758080000405,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block3.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 2621.400253999923,
+      "params": 5184,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage3.block3.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 157.90295500005413,
+      "params": 96,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block3.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 42.91198800001439,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block3.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 41.288988000019344,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block4.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 2028.6744219999946,
+      "params": 5184,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage3.block4.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 356.05389899990314,
+      "params": 216,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block4.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 84.4939759999761,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block4.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 813.8737689999971,
+      "params": 2916,
+      "flops": 73156608,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          1,
+          1
+        ],
+        "groups": 108
+      }
+    },
+    {
+      "name": "Stage3.block4.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 356.9328989999576,
+      "params": 216,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block4.norm_b.se.squeeze",
+      "layer_type": "AdaptiveAvgPool3d",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 31.723991000035312,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {
+        "output_size": 1
+      }
+    },
+    {
+      "name": "Stage3.block4.norm_b.se.conv1",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        108,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        8,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.8880000000081054,
+      "params": 872,
+      "flops": 1728,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block4.norm_b.se.relu",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        8,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        8,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.17300000001796434,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block4.norm_b.se.conv2",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        8,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        108,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.4569990000836697,
+      "params": 972,
+      "flops": 1728,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block4.norm_b.se.sigmoid",
+      "layer_type": "Sigmoid",
+      "input_shape": [
+        1,
+        108,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        108,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.5719999999200809,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block4.norm_b.se.scale",
+      "layer_type": "Mul (element-wise)",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 73.78797900003065,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block4.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 676.7418069999849,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block4.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        108,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 2539.378276999969,
+      "params": 5184,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage3.block4.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 157.8209550000338,
+      "params": 96,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block4.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 43.25198799995178,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage3.block4.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 41.30598799997642,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block0.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 4027.212855000016,
+      "params": 10368,
+      "flops": 260112384,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block0.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 751.3537859999815,
+      "params": 432,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block0.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        216,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        28,
+        28
+      ],
+      "latency_ms": 164.31595300002755,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block0.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 448.0368729999782,
+      "params": 5832,
+      "flops": 36578304,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          2,
+          2
+        ],
+        "groups": 216
+      }
+    },
+    {
+      "name": "Stage4.block0.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 210.2469410000367,
+      "params": 432,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block0.norm_b.se.squeeze",
+      "layer_type": "AdaptiveAvgPool3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 16.895995000027142,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {
+        "output_size": 1
+      }
+    },
+    {
+      "name": "Stage4.block0.norm_b.se.conv1",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.8190000000686268,
+      "params": 3472,
+      "flops": 6912,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block0.norm_b.se.relu",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.1720000000204891,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block0.norm_b.se.conv2",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.5689990000282705,
+      "params": 3672,
+      "flops": 6912,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block0.norm_b.se.sigmoid",
+      "layer_type": "Sigmoid",
+      "input_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.5390000000033979,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block0.norm_b.se.scale",
+      "layer_type": "Mul (element-wise)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 42.69798799998625,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block0.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 335.41490499999327,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block0.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 2482.0662949999814,
+      "params": 20736,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block0.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 88.20597400006136,
+      "params": 192,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block0.branch1_conv",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        48,
+        16,
+        28,
+        28
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 602.9908289999639,
+      "params": 4608,
+      "flops": 28901376,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ],
+        "stride": [
+          1,
+          2,
+          2
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block0.branch1_norm",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 89.10297400007039,
+      "params": 192,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block0.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 21.186994000004233,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block0.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 20.22699399992689,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block1.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 1128.7146790000406,
+      "params": 20736,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block1.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 201.49994299993068,
+      "params": 432,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block1.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 44.7149870000203,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block1.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 399.3728860000374,
+      "params": 5832,
+      "flops": 36578304,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          1,
+          1
+        ],
+        "groups": 216
+      }
+    },
+    {
+      "name": "Stage4.block1.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 201.44494299995586,
+      "params": 432,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block1.norm_b.identity",
+      "layer_type": "Identity",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 0.10900000006586197,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block1.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 334.8479049999469,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block1.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 2459.8883019999676,
+      "params": 20736,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block1.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 89.17697399999724,
+      "params": 192,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block1.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 21.04899400001159,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block1.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 20.582994000051258,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block2.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 1134.83367799995,
+      "params": 20736,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block2.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 200.15994400000636,
+      "params": 432,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block2.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 41.28098900002897,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block2.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 398.8258870000436,
+      "params": 5832,
+      "flops": 36578304,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          1,
+          1
+        ],
+        "groups": 216
+      }
+    },
+    {
+      "name": "Stage4.block2.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 200.68794299993442,
+      "params": 432,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block2.norm_b.se.squeeze",
+      "layer_type": "AdaptiveAvgPool3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 16.940995000027215,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {
+        "output_size": 1
+      }
+    },
+    {
+      "name": "Stage4.block2.norm_b.se.conv1",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.9259990000364269,
+      "params": 3472,
+      "flops": 6912,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block2.norm_b.se.relu",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.16899999991437653,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block2.norm_b.se.conv2",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.4770000000225991,
+      "params": 3672,
+      "flops": 6912,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block2.norm_b.se.sigmoid",
+      "layer_type": "Sigmoid",
+      "input_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.5479999999806751,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block2.norm_b.se.scale",
+      "layer_type": "Mul (element-wise)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 42.55298800001128,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block2.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 337.06690399992567,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block2.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 2487.949294000032,
+      "params": 20736,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block2.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 88.8999750000039,
+      "params": 192,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block2.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 21.261993999928563,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block2.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 20.425993999992897,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block3.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 1131.5456789999416,
+      "params": 20736,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block3.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 200.8799430000181,
+      "params": 432,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block3.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 43.7849869999809,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block3.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 399.19288700002653,
+      "params": 5832,
+      "flops": 36578304,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          1,
+          1
+        ],
+        "groups": 216
+      }
+    },
+    {
+      "name": "Stage4.block3.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 199.85694299998613,
+      "params": 432,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block3.norm_b.identity",
+      "layer_type": "Identity",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 0.03800000001774606,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block3.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 340.05590300000677,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block3.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 2479.3382970000266,
+      "params": 20736,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block3.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 88.9279750000469,
+      "params": 192,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block3.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 21.403994000024795,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block3.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 20.62599400005638,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block4.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 1135.053677999963,
+      "params": 20736,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block4.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 200.0139430000445,
+      "params": 432,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block4.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 40.44498799999019,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block4.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 398.8358869999047,
+      "params": 5832,
+      "flops": 36578304,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          1,
+          1
+        ],
+        "groups": 216
+      }
+    },
+    {
+      "name": "Stage4.block4.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 199.86294299997098,
+      "params": 432,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block4.norm_b.se.squeeze",
+      "layer_type": "AdaptiveAvgPool3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 16.965994999964096,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {
+        "output_size": 1
+      }
+    },
+    {
+      "name": "Stage4.block4.norm_b.se.conv1",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.8689989999529644,
+      "params": 3472,
+      "flops": 6912,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block4.norm_b.se.relu",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.17500000001291482,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block4.norm_b.se.conv2",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.51400000004287,
+      "params": 3672,
+      "flops": 6912,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block4.norm_b.se.sigmoid",
+      "layer_type": "Sigmoid",
+      "input_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.5400000000008731,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block4.norm_b.se.scale",
+      "layer_type": "Mul (element-wise)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 42.86598800001684,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block4.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 335.57890499992027,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block4.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 2487.1612949999644,
+      "params": 20736,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block4.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 88.31897499999286,
+      "params": 192,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block4.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 21.391993999941405,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block4.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 20.657993999975588,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block5.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 1133.7096779999456,
+      "params": 20736,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block5.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 199.92294300004687,
+      "params": 432,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block5.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 43.301988000052916,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block5.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 398.9228870000261,
+      "params": 5832,
+      "flops": 36578304,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          1,
+          1
+        ],
+        "groups": 216
+      }
+    },
+    {
+      "name": "Stage4.block5.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 200.54694400005246,
+      "params": 432,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block5.norm_b.identity",
+      "layer_type": "Identity",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 0.036000000022795575,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block5.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 336.4709049999419,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block5.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 2474.913298000047,
+      "params": 20736,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block5.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 88.19697500007351,
+      "params": 192,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block5.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 21.40099400003237,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block5.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 20.763993999935337,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block6.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 1125.1516809999202,
+      "params": 20736,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block6.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 200.3209429999515,
+      "params": 432,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block6.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 40.555987999937315,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block6.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 398.994886999958,
+      "params": 5832,
+      "flops": 36578304,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          1,
+          1
+        ],
+        "groups": 216
+      }
+    },
+    {
+      "name": "Stage4.block6.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 200.25894299999436,
+      "params": 432,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block6.norm_b.se.squeeze",
+      "layer_type": "AdaptiveAvgPool3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 17.017995000060182,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {
+        "output_size": 1
+      }
+    },
+    {
+      "name": "Stage4.block6.norm_b.se.conv1",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.8319990000463804,
+      "params": 3472,
+      "flops": 6912,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block6.norm_b.se.relu",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.2450000000635555,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block6.norm_b.se.conv2",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.4989999999670545,
+      "params": 3672,
+      "flops": 6912,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block6.norm_b.se.sigmoid",
+      "layer_type": "Sigmoid",
+      "input_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.5409999999983484,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block6.norm_b.se.scale",
+      "layer_type": "Mul (element-wise)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 43.47598799995467,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block6.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 335.60690499996326,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block6.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 2472.657300000037,
+      "params": 20736,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block6.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 88.94097500001408,
+      "params": 192,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block6.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 21.688992999997936,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block6.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 20.94399399993563,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block7.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 1148.7176749999435,
+      "params": 20736,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block7.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 200.00594400005411,
+      "params": 432,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block7.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 42.301987999962876,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block7.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 398.82188800004315,
+      "params": 5832,
+      "flops": 36578304,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          1,
+          1
+        ],
+        "groups": 216
+      }
+    },
+    {
+      "name": "Stage4.block7.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 199.8949439999933,
+      "params": 432,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block7.norm_b.identity",
+      "layer_type": "Identity",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 0.03800000001774606,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block7.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 337.2139049999987,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block7.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 2477.8112979998923,
+      "params": 20736,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block7.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 89.13997500008009,
+      "params": 192,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block7.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 21.4229929999874,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block7.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 20.608993999985614,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block8.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 1133.255679000058,
+      "params": 20736,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block8.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 200.26894399995854,
+      "params": 432,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block8.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 39.59098899997571,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block8.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 398.9538869999478,
+      "params": 5832,
+      "flops": 36578304,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          1,
+          1
+        ],
+        "groups": 216
+      }
+    },
+    {
+      "name": "Stage4.block8.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 200.0099429999409,
+      "params": 432,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block8.norm_b.se.squeeze",
+      "layer_type": "AdaptiveAvgPool3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 17.01099499996417,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {
+        "output_size": 1
+      }
+    },
+    {
+      "name": "Stage4.block8.norm_b.se.conv1",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.7849989999376703,
+      "params": 3472,
+      "flops": 6912,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block8.norm_b.se.relu",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.17300000001796434,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block8.norm_b.se.conv2",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.567999999906533,
+      "params": 3672,
+      "flops": 6912,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block8.norm_b.se.sigmoid",
+      "layer_type": "Sigmoid",
+      "input_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.5359990000215475,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block8.norm_b.se.scale",
+      "layer_type": "Mul (element-wise)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 42.61998799995581,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block8.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 336.8109050001067,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block8.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 2476.6773000000057,
+      "params": 20736,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block8.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 88.27897499998016,
+      "params": 192,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block8.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 21.348993999936283,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block8.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 20.75099399996816,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block9.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 1130.9406800000943,
+      "params": 20736,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block9.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 200.84894299998268,
+      "params": 432,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block9.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 42.259988000068915,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block9.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 398.7408880000203,
+      "params": 5832,
+      "flops": 36578304,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          1,
+          1
+        ],
+        "groups": 216
+      }
+    },
+    {
+      "name": "Stage4.block9.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 199.8629440000741,
+      "params": 432,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block9.norm_b.identity",
+      "layer_type": "Identity",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 0.03800000001774606,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block9.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 336.52890500002286,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block9.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 2491.245294999999,
+      "params": 20736,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block9.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 89.35197499999958,
+      "params": 192,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block9.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 21.2679940000271,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block9.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 20.886993999965853,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block10.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 1126.2276820000352,
+      "params": 20736,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block10.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 199.65694400002576,
+      "params": 432,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block10.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 39.6699880000142,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block10.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 398.9298870000084,
+      "params": 5832,
+      "flops": 36578304,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          1,
+          1
+        ],
+        "groups": 216
+      }
+    },
+    {
+      "name": "Stage4.block10.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 199.86594400006652,
+      "params": 432,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block10.norm_b.se.squeeze",
+      "layer_type": "AdaptiveAvgPool3d",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 16.951995999988867,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {
+        "output_size": 1
+      }
+    },
+    {
+      "name": "Stage4.block10.norm_b.se.conv1",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.8179999999574648,
+      "params": 3472,
+      "flops": 6912,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block10.norm_b.se.relu",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.17300000001796434,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block10.norm_b.se.conv2",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        16,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.5509989999600293,
+      "params": 3672,
+      "flops": 6912,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block10.norm_b.se.sigmoid",
+      "layer_type": "Sigmoid",
+      "input_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        216,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.5429999999932988,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block10.norm_b.se.scale",
+      "layer_type": "Mul (element-wise)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 42.60298799999873,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block10.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 336.48090500003036,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block10.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        216,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 2481.1522980000973,
+      "params": 20736,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage4.block10.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 89.09597500007749,
+      "params": 192,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block10.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 21.379993999971703,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage4.block10.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 20.617995000066003,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block0.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 2246.51536500005,
+      "params": 41472,
+      "flops": 260112384,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage5.block0.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        432,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 409.3668839999509,
+      "params": 864,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block0.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        432,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        14,
+        14
+      ],
+      "latency_ms": 78.61697799989997,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block0.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        432,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 209.092940000005,
+      "params": 11664,
+      "flops": 18289152,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          2,
+          2
+        ],
+        "groups": 432
+      }
+    },
+    {
+      "name": "Stage5.block0.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 99.8079720000078,
+      "params": 864,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block0.norm_b.se.squeeze",
+      "layer_type": "AdaptiveAvgPool3d",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 8.900996999955169,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {
+        "output_size": 1
+      }
+    },
+    {
+      "name": "Stage5.block0.norm_b.se.conv1",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        432,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        32,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.9690000000309738,
+      "params": 13856,
+      "flops": 27648,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block0.norm_b.se.relu",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        32,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        32,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.1770000000078653,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block0.norm_b.se.conv2",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        32,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        432,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.740000000040709,
+      "params": 14256,
+      "flops": 27648,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block0.norm_b.se.sigmoid",
+      "layer_type": "Sigmoid",
+      "input_shape": [
+        1,
+        432,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        432,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.6909989999712707,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block0.norm_b.se.scale",
+      "layer_type": "Mul (element-wise)",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 21.52599399994415,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block0.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 166.4019529999905,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block0.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 1291.7366350000066,
+      "params": 82944,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage5.block0.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 43.04298800002471,
+      "params": 384,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block0.branch1_conv",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        96,
+        16,
+        14,
+        14
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 435.7728769999767,
+      "params": 18432,
+      "flops": 28901376,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ],
+        "stride": [
+          1,
+          2,
+          2
+        ]
+      }
+    },
+    {
+      "name": "Stage5.block0.branch1_norm",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 42.994987000042784,
+      "params": 384,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block0.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 10.565997000071548,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block0.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 9.551997000016854,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block1.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 741.5617899999916,
+      "params": 82944,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage5.block1.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 100.11697200002345,
+      "params": 864,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block1.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 21.395993999931306,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block1.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 192.64494599997306,
+      "params": 11664,
+      "flops": 18289152,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          1,
+          1
+        ],
+        "groups": 432
+      }
+    },
+    {
+      "name": "Stage5.block1.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 100.24297100005697,
+      "params": 864,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block1.norm_b.identity",
+      "layer_type": "Identity",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 0.03699999990658398,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block1.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 166.10795300005066,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block1.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 1283.926637000036,
+      "params": 82944,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage5.block1.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 43.094988000007106,
+      "params": 384,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block1.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 10.382996999965144,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block1.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 9.617997000077594,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block2.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 745.0177900000199,
+      "params": 82944,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage5.block2.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 100.17597199998818,
+      "params": 864,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block2.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 20.314993999932085,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block2.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 192.4999459999981,
+      "params": 11664,
+      "flops": 18289152,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          1,
+          1
+        ],
+        "groups": 432
+      }
+    },
+    {
+      "name": "Stage5.block2.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 99.57497200002763,
+      "params": 864,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block2.norm_b.se.squeeze",
+      "layer_type": "AdaptiveAvgPool3d",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 8.961996999914845,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {
+        "output_size": 1
+      }
+    },
+    {
+      "name": "Stage5.block2.norm_b.se.conv1",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        432,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        32,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 2.0060000000512446,
+      "params": 13856,
+      "flops": 27648,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block2.norm_b.se.relu",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        32,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        32,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.17499900002349023,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block2.norm_b.se.conv2",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        32,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        432,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.7709999999624415,
+      "params": 14256,
+      "flops": 27648,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block2.norm_b.se.sigmoid",
+      "layer_type": "Sigmoid",
+      "input_shape": [
+        1,
+        432,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        432,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.6359999999858701,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block2.norm_b.se.scale",
+      "layer_type": "Mul (element-wise)",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 21.39699400004247,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block2.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 166.04195299998992,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block2.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 1288.5446359999833,
+      "params": 82944,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage5.block2.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 42.63498799991794,
+      "params": 384,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block2.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 10.59499699999833,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block2.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 10.019996999972136,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block3.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 768.8697830000137,
+      "params": 82944,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage5.block3.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 100.1299710000012,
+      "params": 864,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block3.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 21.364994000009574,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block3.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 192.745944999956,
+      "params": 11664,
+      "flops": 18289152,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          1,
+          1
+        ],
+        "groups": 432
+      }
+    },
+    {
+      "name": "Stage5.block3.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 99.46297199996934,
+      "params": 864,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block3.norm_b.identity",
+      "layer_type": "Identity",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 0.03700000002027082,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block3.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 166.1309529999926,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block3.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 1280.0396389999378,
+      "params": 82944,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage5.block3.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 42.64298800001143,
+      "params": 384,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block3.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 10.557996999978059,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block3.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 9.656997000092815,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block4.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 771.1897819999649,
+      "params": 82944,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage5.block4.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 100.13997199996538,
+      "params": 864,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block4.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 20.18799399991167,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block4.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 192.62794500002656,
+      "params": 11664,
+      "flops": 18289152,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          1,
+          1
+        ],
+        "groups": 432
+      }
+    },
+    {
+      "name": "Stage5.block4.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 99.54997199997706,
+      "params": 864,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block4.norm_b.se.squeeze",
+      "layer_type": "AdaptiveAvgPool3d",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 8.914996999919822,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {
+        "output_size": 1
+      }
+    },
+    {
+      "name": "Stage5.block4.norm_b.se.conv1",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        432,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        32,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 5.440998000040054,
+      "params": 13856,
+      "flops": 27648,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block4.norm_b.se.relu",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        32,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        32,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.1920000000836808,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block4.norm_b.se.conv2",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        32,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        432,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.7139999999926658,
+      "params": 14256,
+      "flops": 27648,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block4.norm_b.se.sigmoid",
+      "layer_type": "Sigmoid",
+      "input_shape": [
+        1,
+        432,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        432,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.647999999955573,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block4.norm_b.se.scale",
+      "layer_type": "Mul (element-wise)",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 21.53099400004521,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block4.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 166.065953000043,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block4.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 1286.0186359999943,
+      "params": 82944,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage5.block4.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 42.672987999935685,
+      "params": 384,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block4.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 10.607997000079195,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block4.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 9.769997000034891,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block5.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 751.7287869999336,
+      "params": 82944,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage5.block5.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 100.07397199990464,
+      "params": 864,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block5.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 21.258994000049825,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block5.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 192.64594600008422,
+      "params": 11664,
+      "flops": 18289152,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          1,
+          1
+        ],
+        "groups": 432
+      }
+    },
+    {
+      "name": "Stage5.block5.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 99.57897200001753,
+      "params": 864,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block5.norm_b.identity",
+      "layer_type": "Identity",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 0.038999999901534466,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block5.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 166.17995300009625,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block5.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 1289.3996359999846,
+      "params": 82944,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage5.block5.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 42.72698800002672,
+      "params": 384,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block5.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 10.549996999998257,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block5.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 9.346996999965995,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block6.conv_a",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 738.1067919999396,
+      "params": 82944,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage5.block6.norm_a",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 100.04397199998039,
+      "params": 864,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block6.relu_a",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 20.030993999966995,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block6.conv_b",
+      "layer_type": "Conv3d (3x3x3 depthwise)",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 192.55694599996787,
+      "params": 11664,
+      "flops": 18289152,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          3,
+          3,
+          3
+        ],
+        "stride": [
+          1,
+          1,
+          1
+        ],
+        "groups": 432
+      }
+    },
+    {
+      "name": "Stage5.block6.norm_b.bn",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 99.85897199999272,
+      "params": 864,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block6.norm_b.se.squeeze",
+      "layer_type": "AdaptiveAvgPool3d",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 8.927997000000687,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {
+        "output_size": 1
+      }
+    },
+    {
+      "name": "Stage5.block6.norm_b.se.conv1",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        432,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        32,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.9849999999905776,
+      "params": 13856,
+      "flops": 27648,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block6.norm_b.se.relu",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        32,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        32,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.17800000000534055,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block6.norm_b.se.conv2",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        32,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        432,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 1.694000000043161,
+      "params": 14256,
+      "flops": 27648,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block6.norm_b.se.sigmoid",
+      "layer_type": "Sigmoid",
+      "input_shape": [
+        1,
+        432,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        432,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.6280000000060681,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block6.norm_b.se.scale",
+      "layer_type": "Mul (element-wise)",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 21.382994000077815,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block6.silu",
+      "layer_type": "SiLU",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 166.1179530000254,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block6.conv_c",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 1284.5156370000268,
+      "params": 82944,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Stage5.block6.norm_c",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 42.85598800004209,
+      "params": 384,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block6.residual_add",
+      "layer_type": "Add",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 10.6279970000287,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Stage5.block6.relu_out",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 10.205997000070965,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Head.pool.pre_conv",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        192,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 749.383789000035,
+      "params": 82944,
+      "flops": 130056192,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Head.pool.pre_norm",
+      "layer_type": "BatchNorm3d",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 100.63997099996413,
+      "params": 864,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Head.pool.pre_relu",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "latency_ms": 19.37599399991541,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Head.pool.avgpool",
+      "layer_type": "AvgPool3d",
+      "input_shape": [
+        1,
+        432,
+        16,
+        7,
+        7
+      ],
+      "output_shape": [
+        1,
+        432,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 8.979997999972511,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          16,
+          7,
+          7
+        ]
+      }
+    },
+    {
+      "name": "Head.pool.post_conv",
+      "layer_type": "Conv3d (1x1x1)",
+      "input_shape": [
+        1,
+        432,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        2048,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 13.036996999971961,
+      "params": 884736,
+      "flops": 1769472,
+      "memory_bytes": 0,
+      "extra": {
+        "kernel_size": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Head.pool.post_relu",
+      "layer_type": "ReLU",
+      "input_shape": [
+        1,
+        2048,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        2048,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.3669999999829088,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {}
+    },
+    {
+      "name": "Head.dropout",
+      "layer_type": "Dropout",
+      "input_shape": [
+        1,
+        2048,
+        1,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        2048,
+        1,
+        1,
+        1
+      ],
+      "latency_ms": 0.09999999997489795,
+      "params": 0,
+      "flops": 0,
+      "memory_bytes": 0,
+      "extra": {
+        "p": 0.5
+      }
+    },
+    {
+      "name": "Head.proj",
+      "layer_type": "Linear",
+      "input_shape": [
+        1,
+        2048
+      ],
+      "output_shape": [
+        1,
+        400
+      ],
+      "latency_ms": 29.776991999938218,
+      "params": 819600,
+      "flops": 1638400,
+      "memory_bytes": 0,
+      "extra": {
+        "in_features": 2048,
+        "out_features": 400
+      }
+    }
+  ],
+  "sections": {
+    "Stem": {
+      "latency_ms": 6812.285007000014,
+      "params": 816,
+      "flops": 308281344,
+      "num_layers": 4
+    },
+    "Stage2": {
+      "latency_ms": 43657.896376000055,
+      "params": 15370,
+      "flops": 1667251584,
+      "num_layers": 44
+    },
+    "Stage3": {
+      "latency_ms": 41504.886150000064,
+      "params": 73248,
+      "flops": 1825312896,
+      "num_layers": 72
+    },
+    "Stage4": {
+      "latency_ms": 58938.745291999905,
+      "params": 569256,
+      "flops": 3422638080,
+      "num_layers": 153
+    },
+    "Stage5": {
+      "latency_ms": 21339.78196800001,
+      "params": 1347440,
+      "flops": 2107989504,
+      "num_layers": 99
+    },
+    "Head": {
+      "latency_ms": 927.1597380000003,
+      "params": 1788144,
+      "flops": 133464064,
+      "num_layers": 8
+    }
+  },
+  "notes": ""
+}

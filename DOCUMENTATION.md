@@ -69,8 +69,50 @@
     - 15.3 [C Implementation Details](#153-c-implementation-details)
     - 15.4 [Python ctypes Wrapper](#154-python-ctypes-wrapper)
     - 15.5 [Selecting the Convolution Method](#155-selecting-the-convolution-method)
-16. [Archive and Legacy Code](#16-archive-and-legacy-code)
-17. [Glossary](#17-glossary)
+16. [Int8 Post-Training Quantization (PTQ)](#16-int8-post-training-quantization-ptq)
+17. [Archive and Legacy Code](#17-archive-and-legacy-code)
+18. [Glossary](#18-glossary)
+19. [Int8 Quantized Runtime (scratch/quantized/)](#19-int8-quantized-runtime-scratchquantized)
+    - 19.1 [Why a Separate Quantized Runtime?](#191-why-a-separate-quantized-runtime)
+    - 19.2 [Architecture Overview](#192-architecture-overview)
+    - 19.3 [The Software Reference Int8 Convolution Kernel](#193-the-software-reference-int8-convolution-kernel-conv3d_int8py)
+    - 19.4 [QuantizedConv3d Layer](#194-quantizedconv3d-layer-layerspy)
+    - 19.5 [QuantizedLinear Layer](#195-quantizedlinear-layer-layerspy)
+    - 19.6 [The QuantizedX3D_M Model](#196-the-quantizedx3d_m-model-modelpy)
+    - 19.7 [Int8 Weight Loader](#197-int8-weight-loader-load_int8_weightspy)
+20. [Int8 Inference Entry Point (main_int8.py)](#20-int8-inference-entry-point-main_int8py)
+21. [FPGA Per-Layer Validation Harness (fpga_tests/)](#21-fpga-per-layer-validation-harness-fpga_tests)
+    - 21.1 [The Problem It Solves](#211-the-problem-it-solves)
+    - 21.2 [Four Execution Paths](#212-four-execution-paths)
+    - 21.3 [Quantization Primitives (quant.py)](#213-quantization-primitives-quantpy)
+    - 21.4 [Three Int8 Convolution Kernels (kernels.py)](#214-three-int8-convolution-kernels-kernelspy)
+    - 21.5 [Layer Configurations (layer_configs.py)](#215-layer-configurations-layer_configspy)
+    - 21.6 [The Test Runner (test_layer.py)](#216-the-test-runner-test_layerpy)
+22. [FPGA Int8 C Backend](#22-fpga-int8-c-backend-scratchopsconv3d_fpga_c-and-conv3d_fpgapy)
+    - 22.1 [Purpose](#221-purpose)
+    - 22.2 [C Implementation](#222-c-implementation-conv3d_fpgac)
+    - 22.3 [Python ctypes Wrapper](#223-python-ctypes-wrapper-conv3d_fpgapy)
+    - 22.4 [Building](#224-building)
+23. [Minimal Int8 C Test Harness](#23-minimal-int8-c-test-harness-testing-and-scratchopsconv3d_simple_c)
+    - 23.1 [Purpose](#231-purpose)
+    - 23.2 [Architecture](#232-architecture)
+    - 23.3 [Test Harness (main.c)](#233-test-harness-mainc)
+    - 23.4 [Building and Running](#234-building-and-running)
+24. [Quantization Validation Script](#24-quantization-validation-script-scriptsvalidate_quantizationpy)
+25. [Profiling Dashboard (dashboard.py)](#25-profiling-dashboard-dashboardpy)
+26. [Complete Convolution Layer Catalog](#26-complete-convolution-layer-catalog)
+    - 26.1 [Stem Convolutions](#261-stem-convolutions)
+    - 26.2 [Branch1 (Skip Connection) Convolutions](#262-branch1-skip-connection-convolutions)
+    - 26.3 [Bottleneck Convolutions](#263-bottleneck-convolutions-conv_a-conv_b-conv_c)
+    - 26.4 [Head Convolutions](#264-head-convolutions)
+    - 26.5 [SE Convolutions](#265-se-convolutions-inside-even-indexed-blocks)
+27. [FPGA Integration Plan](#27-fpga-integration-plan-fpga_flowmd)
+    - 27.1 [Three-Phase Deployment](#271-three-phase-deployment)
+    - 27.2 [CPU/FPGA Handshake Protocol](#272-cpufpga-handshake-protocol)
+    - 27.3 [Freeze-One-Layer-At-A-Time Discipline](#273-freeze-one-layer-at-a-time-discipline)
+28. [Updated File Layout](#28-updated-file-layout)
+29. [Suggested Diagrams and Figures](#29-suggested-diagrams-and-figures)
+30. [Summary of All Implemented Components](#30-summary-of-all-implemented-components)
 
 ---
 
@@ -945,7 +987,7 @@ These constraints make optimization essential. The two primary acceleration stra
 
 The PolarFire SoC provides 4 application-class U54 cores. With a coherent shared memory system and Linux running on all four cores, standard POSIX threading (pthreads) is fully supported. Python's `threading` module, `concurrent.futures.ThreadPoolExecutor`, and `multiprocessing` module all work on this platform.
 
-The scratch library's convolution operations now use **adaptive multi-threaded parallelism** via a persistent `concurrent.futures.ThreadPoolExecutor` with `NUM_THREADS = 4` workers. The implementation lives in `scratch/ops/conv3d.py` and automatically selects the optimal threading strategy (output-channel parallelism or temporal parallelism) based on the convolution type. Batch normalization, activation, and pooling operations remain single-threaded, as they are memory-bandwidth-bound and benefit less from threading on the PolarFire SoC's shared memory bus (see Section 14.7).
+The scratch library's convolution operations use **adaptive multi-threaded parallelism** via a persistent `concurrent.futures.ThreadPoolExecutor` with `NUM_THREADS = 4` workers. The implementation lives in `scratch/ops/conv3d.py` and automatically selects the optimal threading strategy (output-channel parallelism or temporal parallelism) based on the convolution type. Batch normalization, activation, and pooling operations remain single-threaded, as they are memory-bandwidth-bound and benefit less from threading on the PolarFire SoC's shared memory bus (see Section 14.7).
 
 ### 14.2 Strategy 1: Output-Channel Parallelism in conv3d_forward_fast
 
@@ -1096,7 +1138,7 @@ While the Python+OpenCV convolution implementations (`"fast"` and `"threaded"`) 
 
 The `"native"` method eliminates Python overhead entirely for the convolution kernel by implementing the full 3D convolution in C, compiled as a shared library (`libconv3d.so`) and called from Python via ctypes. The C implementation targets the specific hardware characteristics of the PolarFire SoC:
 
-- **RV64GC ISA** — no vector extension (RVV), so no SIMD intrinsics; performance comes from scalar optimisations and compiler auto-optimisation with `-O3 -funroll-loops -ffast-math`.
+- **RV64GC ISA** — no vector extension (RVV), so no SIMD intrinsics; performance comes from scalar optimisations and compiler auto-optimisation with `-O3 -funroll-loops -ffast-math` 
 - **4× U54 cores** — pthreads with 4 worker threads, partitioning `(batch × output_channel)` work items.
 - **32 KiB L1 data cache per core** — spatial tiling with `TILE_H=8, TILE_W=16` keeps the input receptive field of each tile inside L1.
 
@@ -1306,6 +1348,703 @@ These files are retained for historical reference but are not used by the curren
 
 ---
 
+## 19. Int8 Quantized Runtime (scratch/quantized/)
+
+The `scratch/quantized/` subpackage is a completely self-contained int8 inference runtime for X3D-M. It is the bridge between the float32 software reference and the future FPGA accelerator. Nothing in this subpackage is imported by the float32 path -- you can run both `scratch.models.x3d_m.X3D_M` (float32) and `scratch.quantized.model.QuantizedX3D_M` (int8) in the same Python process on separate model instances without interference.
+
+### 19.1 Why a Separate Quantized Runtime?
+
+The float32 `scratch` library is a faithful NumPy reimplementation of PyTorch's X3D-M, designed for correctness verification and CPU-side inference. But the PolarFire SoC's FPGA fabric operates on integer arithmetic -- specifically int8 × int8 multiplications accumulated into int32. To deploy convolutions on the FPGA, we need a parallel runtime where:
+
+1. Weights are stored as int8 (4× smaller than float32, reducing DRAM bandwidth demands on the 32-bit LPDDR4 bus).
+2. Activations are quantized from float32 to int8 at layer boundaries.
+3. The convolution itself runs entirely in integer arithmetic.
+4. The output is requantized back to int8 (or dequantized to float32 for the next float operation).
+
+Rather than modifying the float32 library and breaking its role as a correctness reference, the int8 runtime lives in its own subpackage and reuses the float32 model's *structure* (same module tree, same forward pass logic) while swapping out the computational layers.
+
+### 19.2 Architecture Overview
+
+The quantized runtime is composed of four files:
+
+```
+scratch/quantized/
+├── __init__.py           # Public API: exports all key classes and functions
+├── conv3d_int8.py        # Software reference int8 3D convolution kernel
+├── layers.py             # QuantizedConv3d and QuantizedLinear module classes
+├── load_int8_weights.py  # Loader for int8 .npz weight files
+└── model.py              # QuantizedX3D_M builder (swap Conv3d→QuantizedConv3d)
+```
+
+The dependency flow is: `model.py` → `layers.py` → `conv3d_int8.py`, with `load_int8_weights.py` operating on the constructed model.
+
+### 19.3 The Software Reference Int8 Convolution Kernel (conv3d_int8.py)
+
+This file implements, in pure NumPy, the exact sequence of operations that the FPGA accelerator will perform for one quantized Conv3d layer. It is not designed for speed -- it uses nested loops over spatial positions. Its purpose is to be a bit-accurate model of the hardware so the rest of the pipeline can be developed and validated without waiting for the FPGA bitstream.
+
+**Function signature:**
+
+```python
+def conv3d_int8_forward(
+    x_q: np.ndarray,       # int8, (B, C_in, T, H, W)
+    weight_q: np.ndarray,  # int8, (C_out, C_in//groups, kT, kH, kW)
+    bias_q: np.ndarray,    # int32, (C_out,) or None
+    input_scale: float,    # per-tensor float32 scale
+    weight_scale: np.ndarray,  # per-channel float32 scale, (C_out,)
+    output_scale: float,   # per-tensor float32 scale
+    stride, padding, groups
+) -> np.ndarray:           # int8, (B, C_out, T', H', W')
+```
+
+**Step-by-step operation:**
+
+1. **Pad the int8 input** with zeros using `_pad_3d_int8()`. Under symmetric quantization, integer zero corresponds to float 0.0, so padding with zero is semantically correct.
+
+2. **Promote to int32** for accumulation: `x_padded.astype(np.int32)` and `weight_q.astype(np.int32)`. This prevents overflow during the multiply-accumulate loop.
+
+3. **Compute the int32 accumulator** by iterating over every output spatial position `(t, h, w)`, extracting the input patch, and performing a matrix multiply against the flattened weights: `patch_flat @ w_flat.T`. This produces exact int32 results because int8 × int8 fits comfortably in int32 (worst case: 127 × 127 × 27 kernel elements × say 432 channels ≈ 188M, well within int32 range of 2.1B).
+
+4. **Add int32 bias** directly into the accumulator: `acc += bias_q.reshape(1, C_out, 1, 1, 1)`. The bias was pre-scaled during PTQ such that `bias_q[c]` has an implicit scale of `input_scale * weight_scale[c]`, matching the accumulator's implicit scale.
+
+5. **Requantize to int8** using the per-channel multiplier `M[c] = (input_scale * weight_scale[c]) / output_scale`. The accumulator is cast to float32, multiplied by M, rounded to nearest integer, clipped to [-127, 127], and cast to int8. The current implementation uses float32 for this step; the FPGA will use the fixed-point `(M0, n)` form described in Section 21.
+
+### 19.4 QuantizedConv3d Layer (layers.py)
+
+`QuantizedConv3d` is the int8 drop-in replacement for `scratch.nn.conv3d.Conv3d`. It has the same constructor signature (in_channels, out_channels, kernel_size, stride, padding, groups) plus a `backend` parameter.
+
+**Stored parameters** (in `_parameters` dict):
+
+| Parameter | Dtype | Shape | Description |
+|-----------|-------|-------|-------------|
+| `weight_q` | int8 | `(C_out, C_in//groups, kT, kH, kW)` | Quantized weights |
+| `weight_scale` | float32 | `(C_out,)` | Per-channel weight scale |
+| `bias_q` | int32 | `(C_out,)` or None | Quantized bias (scaled by `s_in * s_w[c]`) |
+| `input_scale` | float32 | scalar | Per-tensor input activation scale |
+| `output_scale` | float32 | scalar | Per-tensor output activation scale |
+
+**Forward pass (the three-step quantize-compute-dequantize dance):**
+
+```
+x_f32 ──quantize──> x_q ──int8 conv──> y_q ──dequantize──> y_f32
+```
+
+1. **`_quantize_input(x_f32)`**: divides by `input_scale`, rounds, clips to [-127, 127], casts to int8.
+2. **`_run_backend(x_q)`**: dispatches to either `conv3d_int8_forward` (the reference NumPy kernel) or a future FPGA driver.
+3. **`_dequantize_output(y_q)`**: multiplies int8 result by `output_scale` to recover float32.
+
+This boundary quantize/dequantize strategy means the quantized model accepts float32 input and produces float32 output, making it interchangeable with the float32 model from the caller's perspective. Activations that flow between layers (like the SiLU activation between conv_b's BN and conv_c) are processed in float32 -- only the convolution itself runs in int8. This is the "hybrid" approach described in `fpga_flow.md`.
+
+**The `backend` parameter:**
+- `"reference"`: uses `conv3d_int8_forward` from `conv3d_int8.py` (pure NumPy, slow but correct).
+- `"fpga"`: placeholder that raises `NotImplementedError`. When the real FPGA driver is ready, this branch will DMA the int8 tensors to FPGA memory, trigger the accelerator, and read back the int8 result.
+
+### 19.5 QuantizedLinear Layer (layers.py)
+
+`QuantizedLinear` does for the classification head what `QuantizedConv3d` does for convolution layers. It performs `x_q @ W_q^T` in int32, adds the int32 bias, requantizes with per-channel M, and dequantizes back to float32.
+
+In the current X3D-M model, the Head's final linear projection (2048 → 400) is **not** quantized -- it stays in float32. `QuantizedLinear` exists for completeness and for future work where the linear layer might also be offloaded.
+
+### 19.6 The QuantizedX3D_M Model (model.py)
+
+Rather than re-declaring the entire X3D-M architecture from scratch, `QuantizedX3D_M` inherits from `X3D_M` and rewrites its module tree in-place:
+
+1. **Every `Conv3d`** is replaced with a `QuantizedConv3d` having the same constructor arguments.
+2. **Every `BatchNorm3d`** is replaced with an `_IdentityModule` (a no-op). This reflects the fact that BN has already been folded into the preceding Conv3d during PTQ (see Section 16.3).
+3. **The Head's Linear** (`proj_weight`, `proj_bias`) stays in float32.
+
+The recursive swap is performed by `_swap_conv_and_bn(parent, backend)`, which walks the module tree and replaces children by type. Both the `_modules` dict entry and the instance attribute (e.g., `self.conv_a`) are updated to keep `forward()` calls working.
+
+**Builder function:**
+
+```python
+model = build_quantized_x3d_m(
+    num_classes=400,
+    weights_path="weights/x3d_m_int8.npz",
+    backend="reference",
+)
+model.eval()
+logits = model.forward(x_f32)   # float32 in, float32 out
+```
+
+### 19.7 Int8 Weight Loader (load_int8_weights.py)
+
+The int8 weight loader is separate from the float32 loader (`scratch/load_weights.py`) because the float32 loader assumes all parameters are float32 and would corrupt int8 and int32 arrays. The int8 loader:
+
+1. Loads the `.npz` file and iterates over its keys.
+2. Splits each key (e.g., `blocks.1.res_blocks.0.branch2.conv_a.weight_q`) into a module path and a parameter suffix.
+3. Walks the module tree to find the target `QuantizedConv3d` or `QuantizedLinear`.
+4. Enforces the expected dtype for each suffix (int8 for `weight_q`, float32 for `weight_scale`, int32 for `bias_q`, etc.).
+5. Performs shape checking and copies the array into the module's `_parameters`.
+6. Returns lists of missing and unexpected keys for diagnostics.
+
+Recognized parameter suffixes: `weight_q`, `weight_scale`, `bias_q`, `input_scale`, `output_scale`, `proj_weight`, `proj_bias`.
+
+---
+
+## 20. Int8 Inference Entry Point (main_int8.py)
+
+`main_int8.py` is the int8 counterpart to `main.py`. It provides a self-contained command-line interface for running the quantized model:
+
+```bash
+python main_int8.py --weights weights/x3d_m_int8.npz
+python main_int8.py --weights weights/x3d_m_int8.npz --backend reference
+python main_int8.py --dry-run    # Build model only, verify weight loading
+```
+
+**Key differences from main.py:**
+- Uses `build_quantized_x3d_m()` instead of `build_x3d_m()`
+- Does not include profiling (the reference kernel is intentionally slow)
+- Includes a `--dry-run` flag for testing that the model builds and weights load cleanly without running the expensive forward pass
+- Prints a warning that the reference kernel is "pure NumPy nested loops and intended for correctness, not speed"
+- Supports `--backend` selection (currently only "reference")
+
+---
+
+## 21. FPGA Per-Layer Validation Harness (fpga_tests/)
+
+The `fpga_tests/` directory validates the int8 FPGA-offload path one convolution layer at a time. It implements the "tensor-by-tensor dataflow" discipline from `fpga_flow.md`, where each layer is brought up independently before integrating into the full pipeline.
+
+### 21.1 The Problem It Solves
+
+On the PolarFire SoC, we want to move 3D convolutions off the RISC-V CPU and onto the FPGA fabric. The FPGA only sees int8 data. Three questions must be answered before we can trust the FPGA:
+
+1. **Does the quantization math work?** Given float32 input and weights, can we produce int8 equivalents, run an int8 conv, and get a float32 result close to the original?
+2. **Does the FPGA's fixed-point requantizer agree with the float32 reference?** The hardware uses `(M0, n)` shift-and-multiply instead of float multiply.
+3. **Does the C backend (FPGA offload library) agree bit-for-bit with the Python simulator?** The C library mirrors the FPGA's exact datapath.
+
+### 21.2 Four Execution Paths
+
+The harness runs each convolution layer through four parallel paths and compares them:
+
+| Path | Where it runs | Arithmetic | Requantize | Purpose |
+|------|--------------|------------|------------|---------|
+| Float reference | CPU | float32 | none | Accuracy ceiling |
+| Software int8 (gold) | CPU | float32→int32 | float M | "Correct" int8 output |
+| FPGA simulator | CPU (Python) | float32→int32 | fixed-point (M0, n) | Python stand-in for FPGA |
+| **FPGA HW (C backend)** | CPU (C lib) | **int8→int32** | **fixed-point (M0, n)** | **FPGA offload library** |
+
+### 21.3 Quantization Primitives (quant.py)
+
+This file implements symmetric int8 quantization from the ground up:
+
+**Scale computation:**
+- `compute_tensor_scale(x)`: `s = max(|x|) / 127` — per-tensor symmetric scale
+- `compute_weight_scales(W)`: per-output-channel scale, shape `(C_out,)`
+
+**Quantize/dequantize:**
+- `quantize_tensor(x, s)`: `round(x / s)`, clip to [-127, 127], cast to int8
+- `quantize_weights(W, s_w)`: per-channel weight quantization
+- `dequantize_tensor(q, s)`: `q * s` back to float32
+
+**The clipping range is [-127, +127]** (deliberately dropping -128). This keeps the range symmetric around zero and eliminates a corner case in fixed-point requantization hardware.
+
+**Requantization multiplier:**
+- `compute_M(s_in, s_w, s_out)`: `M[c] = (s_in * s_w[c]) / s_out` — per-channel float32
+
+**Fixed-point decomposition:**
+- `quantize_multiplier_fixed_point(M)`: decomposes each float32 M[c] into `M0[c] * 2^(-n[c])` where M0 is an int32 in [2^30, 2^31-1]. This is the same decomposition used by TFLite and CMSIS-NN. The CPU computes (M0, n) once at model-build time; the FPGA only ever sees the integer pair.
+
+**Two requantization implementations:**
+- `apply_requantize_float(acc32, M)`: software reference, float32 multiply. `round(acc32 * M[c])`, clip, cast to int8.
+- `apply_requantize_fixed_point(acc32, M0, n)`: FPGA-style, int64 multiply + rounding right-shift. `saturate_int8(round_nearest((acc32 * M0[c]) >> n[c]))`. Uses round-half-away-from-zero, matching TFLite/CMSIS-NN convention.
+
+### 21.4 Three Int8 Convolution Kernels (kernels.py)
+
+All three share the same calling convention: `(x_q, W_q, <requant params>, stride, padding, groups) -> int8 output`.
+
+**`sw_int8_conv3d` (Software reference):** Uses the existing float32 conv kernel by passing int8 values as float32. The float32 kernel produces exact integer accumulators as long as intermediate sums fit in the 24-bit float mantissa. For X3D-M's layer shapes, the worst case is well under 2^24, so the int32 cast is lossless. Requantizes with float M.
+
+**`fpga_sim_int8_conv3d` (FPGA simulator in Python):** Same integer accumulation trick, but requantizes with fixed-point (M0, n) instead of float M. This is the Python stand-in for what the FPGA fabric will do.
+
+**`fpga_hw_int8_conv3d` (C backend):** Imported from `scratch.ops.conv3d_fpga`. Does true int8×int8→int32 arithmetic natively in C with pthreads. Uses the same (M0, n) requantization. This function gets swapped for a DMA call once the real FPGA fabric is wired up.
+
+### 21.5 Layer Configurations (layer_configs.py)
+
+Each entry in `LAYER_CONFIGS` is a `LayerConfig` dataclass specifying everything needed to instantiate and test a single Conv3d:
+
+```python
+@dataclass(frozen=True)
+class LayerConfig:
+    name: str                    # e.g., "conv_b"
+    in_channels: int
+    out_channels: int
+    kernel_size: Tuple[int,int,int]
+    stride: Tuple[int,int,int]
+    padding: Tuple[int,int,int]
+    groups: int
+    input_shape: Tuple[int,int,int,int,int]  # (B, C, T, H, W)
+    description: str
+```
+
+Five conv types are pre-configured, covering every convolution variety in X3D-M:
+
+| Layer | Kernel | Groups | Description |
+|-------|--------|--------|-------------|
+| `conv_b` | (3,3,3) | 54 (depthwise) | Bottleneck depthwise conv |
+| `conv_a` | (1,1,1) | 1 (standard) | Bottleneck expand pointwise |
+| `conv_c` | (1,1,1) | 1 (standard) | Bottleneck project pointwise |
+| `conv_t` | (1,3,3) | 1 (standard) | Stem spatial conv |
+| `conv_xy` | (5,1,1) | 24 (depthwise) | Stem temporal depthwise |
+
+Adding a new conv type is one dict entry -- no other file needs to change.
+
+### 21.6 The Test Runner (test_layer.py)
+
+The CLI entry point orchestrates the full test:
+
+```bash
+python -m fpga_tests.test_layer                     # default: conv_b, seed 42
+python -m fpga_tests.test_layer --layer conv_a      # test pointwise conv
+python -m fpga_tests.test_layer --layer conv_t --seed 7
+python -m fpga_tests.test_layer --skip-fpga-hw      # skip C backend
+```
+
+**Step-by-step execution:**
+
+1. Build a float Conv3d from the LayerConfig with Xavier-initialized weights from a fixed seed.
+2. Generate a reproducible float32 input with `np.random.default_rng(seed)`.
+3. Run the float conv → `y_ref_f32` (accuracy ceiling).
+4. Compute quantization parameters: `s_in`, `s_w`, `s_out`, M, (M0, n).
+5. Quantize input and weights to int8.
+6. Run three int8 convolutions (software, FPGA sim, FPGA HW).
+7. Dequantize all results back to float32.
+8. Compare with diff statistics (max abs, mean abs, RMS).
+9. Save all tensors to `.npz` and a summary to `.json`.
+
+**Pass criteria:**
+- **Sim vs SW**: max int8 disagreement ≤ `--tol-lsb` (default 2 LSBs). This absorbs float-vs-fixed-point rounding differences.
+- **HW vs Sim**: must be **bit-identical** (0 LSB tolerance). Both implement the exact same (M0, n) requantization.
+
+**Reference numbers (seed 42):**
+
+| Layer | Output Shape | Sim vs SW (int8 max) | HW vs Sim (int8 max) | SW vs float ref (RMS) |
+|-------|-------------|---------------------|---------------------|---------------------|
+| conv_a | (1, 54, 16, 56, 56) | ≤ 2 | 0 | ~1e-2 |
+| conv_b | (1, 54, 16, 28, 28) | ≤ 1 | 0 | ~1e-2 |
+| conv_c | (1, 24, 16, 28, 28) | ≤ 1 | 0 | ~1e-2 |
+| conv_t | (1, 24, 16, 112, 112) | ≤ 1 | 0 | ~1e-2 |
+| conv_xy | (1, 24, 16, 112, 112) | ≤ 1 | 0 | ~1e-2 |
+
+---
+
+## 22. FPGA Int8 C Backend (scratch/ops/conv3d_fpga_c/ and conv3d_fpga.py)
+
+### 22.1 Purpose
+
+The FPGA int8 C backend (`libconv3d_fpga.so`) is a CPU-executable library that implements the same datapath the real FPGA accelerator will use: int8 × int8 → int32 accumulation followed by fixed-point (M0, n) requantization to int8. When the real FPGA fabric is wired up, the body of this function gets replaced by a DMA wrapper -- the signature stays identical.
+
+### 22.2 C Implementation (conv3d_fpga.c)
+
+The C function `conv3d_fpga_int8()` takes:
+- `int8_t *input`, `int8_t *weight`, `int8_t *output` (input/output tensors)
+- `int64_t *M0`, `int32_t *n` (per-channel fixed-point requantization params)
+- Shape parameters: B, C_in, T, H, W, C_out, kT, kH, kW, strides, padding, groups
+
+It handles zero-padding internally, performs true int8×int8→int32 native multiplication (no float casting), and applies the (M0, n) requantization identically to the Python `apply_requantize_fixed_point()` function. Uses pthreads for parallelism (4 threads matching the 4 U54 cores).
+
+### 22.3 Python ctypes Wrapper (conv3d_fpga.py)
+
+`scratch/ops/conv3d_fpga.py` loads `libconv3d_fpga.so` at import time using ctypes, registers the C function signature, and exposes `fpga_hw_int8_conv3d()` with the same calling convention as `fpga_sim_int8_conv3d` in `fpga_tests/kernels.py`:
+
+```python
+def fpga_hw_int8_conv3d(x_q, W_q, M0, n, stride, padding, groups) -> int8 output
+```
+
+The function ensures all arrays are contiguous with the correct dtype (int8, int64, int32), computes output dimensions, allocates the output buffer, and marshals everything through ctypes.
+
+### 22.4 Building
+
+```bash
+make -C scratch/ops/conv3d_fpga_c              # auto-detect architecture
+make -C scratch/ops/conv3d_fpga_c riscv        # RISC-V target
+make -C scratch/ops/conv3d_fpga_c native       # x86 native
+```
+
+---
+
+## 23. Minimal Int8 C Test Harness (testing/ and scratch/ops/conv3d_simple_c/)
+
+### 23.1 Purpose
+
+Before building the full-featured FPGA C backend with requantization, a minimal "bare metal" int8 convolution was implemented to validate the most basic operation: `output[int32] = conv3d(input[int8], weight[int8])`. No quantization scales, no requantization, no threading, no bias. Just the raw multiply-accumulate.
+
+This serves as the ground truth that the FPGA implementation must match at the accumulator level before any requantization logic is added.
+
+### 23.2 Architecture
+
+Two implementations share an identical C API (`conv3d_simple.h`):
+
+**`conv3d_int8_sw`** (conv3d_sw.c): Pure-C CPU reference. Single-threaded deeply nested loops. The accumulator is int32. int8 × int8 is promoted to int32 for accumulation -- no overflow is possible for any X3D-M layer shape.
+
+**`conv3d_int8_fpga`** (conv3d_fpga.c): FPGA-offload entry point. Today it is a **stub** that pretends to DMA data to an accelerator:
+- STEP 1: `fpga_dma_to_device()` — placeholder, does nothing
+- STEP 2: `fpga_launch_and_wait()` — placeholder; actually calls `conv3d_int8_sw()` as the "FPGA"
+- STEP 3: `fpga_dma_from_device()` — placeholder, does nothing
+
+The stub guarantees the two implementations agree bit-for-bit, so the comparison harness exercises the full plumbing without real hardware. When the real FPGA driver exists, only the three stub functions need to change.
+
+### 23.3 Test Harness (main.c)
+
+Two versions exist:
+
+**`scratch/ops/conv3d_simple_c/main.c`**: Tests a single small depthwise 3x3x3 configuration (4 channels, 4×8×8 spatial). Prints side-by-side output values for visual inspection.
+
+**`testing/main.c`**: Tests **all 28 unique Conv3d configurations** in X3D-M in a single run. This covers:
+- 2 stem convolutions (conv_t, conv_xy)
+- 4 branch1 skip connections (one per stage)
+- 8 conv_a configurations (2 per stage: first block vs remaining blocks)
+- 8 conv_b configurations (same split)
+- 4 conv_c configurations (one per stage)
+- 2 head convolutions (pre_conv, post_conv)
+
+Each layer uses a deterministic LCG PRNG seeded per-layer for reproducibility. The test fills input and weight buffers with random int8 values, runs both implementations, and compares element-for-element:
+
+```
+[14] conv_b_s2_blk0
+     input  (1, 54, 16, 112, 112)
+     weight (54, 1, 3, 3, 3)  groups=54
+     output (1, 54, 16, 56, 56)
+     elements=2408448  mismatched=0  max_diff=0  PASS
+```
+
+### 23.4 Building and Running
+
+```bash
+# Build and run the simple single-config test
+cd scratch/ops/conv3d_simple_c && make && make run
+
+# Build and run the full 28-layer test
+cd testing && make && make run
+```
+
+---
+
+## 24. Quantization Validation Script (scripts/validate_quantization.py)
+
+This script validates that the int8 `.npz` weights produced by `quantize_x3d_ptq.py` load correctly and produce reasonable outputs. It:
+
+1. Builds the quantized model using `build_quantized_x3d_m()`.
+2. Loads the int8 weights from the specified `.npz` file.
+3. Runs a forward pass on random or calibration input.
+4. Reports the output distribution, top-5 predictions, and any anomalies (NaN, inf, all-zero outputs).
+
+This serves as a sanity check in the quantization pipeline: PTQ script → validate → deploy to SoC.
+
+---
+
+## 25. Profiling Dashboard (dashboard.py)
+
+The `dashboard.py` file implements an interactive web-based profiling dashboard for visualizing X3D-M inference performance across different platforms and configurations. It uses Dash/Plotly to render:
+
+- Real-time comparison of inference latency across platforms (macOS vs PolarFire SoC)
+- Per-layer breakdown charts showing which operations are the bottlenecks
+- Section-by-section timing (Stem, Stage 2, Stage 3, Stage 4, Stage 5, Head)
+- Threading speedup analysis
+- Memory bandwidth utilization estimates
+
+The dashboard reads profiling JSON files from `run_stats/` and presents them in an interactive interface where you can filter by platform, convolution method, and model section.
+
+---
+
+## 26. Complete Convolution Layer Catalog
+
+Every unique Conv3d configuration in X3D-M is listed below. Understanding this catalog is essential for FPGA design because each unique configuration represents a different hardware workload.
+
+### 26.1 Stem Convolutions
+
+| Name | In→Out | Kernel | Stride | Padding | Groups | Input Shape | Output Shape |
+|------|--------|--------|--------|---------|--------|-------------|--------------|
+| conv_t | 3→24 | (1,3,3) | (1,2,2) | (0,1,1) | 1 | (1,3,16,224,224) | (1,24,16,112,112) |
+| conv_xy | 24→24 | (5,1,1) | (1,1,1) | (2,0,0) | 24 | (1,24,16,112,112) | (1,24,16,112,112) |
+
+### 26.2 Branch1 (Skip Connection) Convolutions
+
+These only appear in the first block of each stage, where dimensions change:
+
+| Stage | In→Out | Stride | Input Shape | Output Shape |
+|-------|--------|--------|-------------|--------------|
+| 2 | 24→24 | (1,2,2) | (1,24,16,112,112) | (1,24,16,56,56) |
+| 3 | 24→48 | (1,2,2) | (1,24,16,56,56) | (1,48,16,28,28) |
+| 4 | 48→96 | (1,2,2) | (1,48,16,28,28) | (1,96,16,14,14) |
+| 5 | 96→192 | (1,2,2) | (1,96,16,14,14) | (1,192,16,7,7) |
+
+### 26.3 Bottleneck Convolutions (conv_a, conv_b, conv_c)
+
+**conv_a** (1×1×1 pointwise expand):
+
+| Stage | Block | In→Out | Input Shape | Output Shape |
+|-------|-------|--------|-------------|--------------|
+| 2 | 0 | 24→54 | (1,24,16,112,112) | (1,54,16,112,112) |
+| 2 | 1-2 | 24→54 | (1,24,16,56,56) | (1,54,16,56,56) |
+| 3 | 0 | 24→108 | (1,24,16,56,56) | (1,108,16,56,56) |
+| 3 | 1-4 | 48→108 | (1,48,16,28,28) | (1,108,16,28,28) |
+| 4 | 0 | 48→216 | (1,48,16,28,28) | (1,216,16,28,28) |
+| 4 | 1-10 | 96→216 | (1,96,16,14,14) | (1,216,16,14,14) |
+| 5 | 0 | 96→432 | (1,96,16,14,14) | (1,432,16,14,14) |
+| 5 | 1-6 | 192→432 | (1,192,16,7,7) | (1,432,16,7,7) |
+
+**conv_b** (3×3×3 depthwise):
+
+| Stage | Block | Channels | Stride | Input Shape | Output Shape |
+|-------|-------|----------|--------|-------------|--------------|
+| 2 | 0 | 54 | (1,2,2) | (1,54,16,112,112) | (1,54,16,56,56) |
+| 2 | 1-2 | 54 | (1,1,1) | (1,54,16,56,56) | (1,54,16,56,56) |
+| 3 | 0 | 108 | (1,2,2) | (1,108,16,56,56) | (1,108,16,28,28) |
+| 3 | 1-4 | 108 | (1,1,1) | (1,108,16,28,28) | (1,108,16,28,28) |
+| 4 | 0 | 216 | (1,2,2) | (1,216,16,28,28) | (1,216,16,14,14) |
+| 4 | 1-10 | 216 | (1,1,1) | (1,216,16,14,14) | (1,216,16,14,14) |
+| 5 | 0 | 432 | (1,2,2) | (1,432,16,14,14) | (1,432,16,7,7) |
+| 5 | 1-6 | 432 | (1,1,1) | (1,432,16,7,7) | (1,432,16,7,7) |
+
+**conv_c** (1×1×1 pointwise project):
+
+| Stage | In→Out | Input Shape | Output Shape |
+|-------|--------|-------------|--------------|
+| 2 | 54→24 | (1,54,16,56,56) | (1,24,16,56,56) |
+| 3 | 108→48 | (1,108,16,28,28) | (1,48,16,28,28) |
+| 4 | 216→96 | (1,216,16,14,14) | (1,96,16,14,14) |
+| 5 | 432→192 | (1,432,16,7,7) | (1,192,16,7,7) |
+
+### 26.4 Head Convolutions
+
+| Name | In→Out | Input Shape | Output Shape |
+|------|--------|-------------|--------------|
+| pre_conv | 192→432 | (1,192,16,7,7) | (1,432,16,7,7) |
+| post_conv | 432→2048 | (1,432,1,1,1) | (1,2048,1,1,1) |
+
+### 26.5 SE Convolutions (inside even-indexed blocks)
+
+| SE Layer | Mid Channels | Example (Stage 2, inner=54) |
+|----------|-------------|----------------------------|
+| conv1 | `_round_width(inner, 0.0625)` | 54 × 0.0625 = 3.375 → rounded to 8 |
+| conv2 | Same mid → inner | 8 → 54 |
+
+SE conv1/conv2 are 1×1×1 pointwise with bias=True, operating on `(B, C, 1, 1, 1)` tensors (after global average pooling).
+
+---
+
+## 27. FPGA Integration Plan (fpga_flow.md)
+
+The project includes a comprehensive FPGA integration planning document (`fpga_flow.md`) that lays out the full roadmap for moving from software-only execution to hardware-accelerated inference on the PolarFire SoC. Key sections include:
+
+### 27.1 Three-Phase Deployment
+
+**Phase 1 (Current):** Float32 software inference on RISC-V CPU. Multi-threaded Python/OpenCV or C backend. Validates correctness against PyTorch reference.
+
+**Phase 2 (In Progress):** Int8 quantized inference with software reference kernel. BN folding, PTQ calibration, per-layer FPGA bring-up testing. The quantized model runs end-to-end on the CPU using the int8 reference kernel.
+
+**Phase 3 (Future):** FPGA-accelerated int8 convolution. The C backend's function body is replaced with DMA transfers to the FPGA fabric. The rest of the pipeline (quantize/dequantize at boundaries, activations, pooling, linear) stays on the CPU.
+
+### 27.2 CPU/FPGA Handshake Protocol
+
+For each convolution layer during inference:
+
+1. **CPU** quantizes the float32 activation to int8 using `input_scale`
+2. **CPU** DMAs the int8 input tensor and int8 weights to FPGA-visible memory
+3. **CPU** writes shape registers and the (M0, n) requantization table to the FPGA
+4. **CPU** triggers the FPGA accelerator and waits for completion
+5. **FPGA** performs int8×int8→int32 convolution with spatial tiling
+6. **FPGA** applies (M0, n) requantization to produce int8 output
+7. **CPU** DMAs the int8 output back
+8. **CPU** dequantizes to float32 for the next non-conv operation (activation, pooling)
+
+### 27.3 Freeze-One-Layer-At-A-Time Discipline
+
+The bring-up strategy validates each layer independently before combining:
+
+1. Test `conv_b` (depthwise 3×3×3) — the most common and FPGA-friendly conv
+2. Test `conv_a` (pointwise 1×1×1) — simple but high-throughput
+3. Test `conv_c` (pointwise 1×1×1) — same as conv_a but different channel dims
+4. Test `conv_t` (standard 1×3×3) — the stem spatial conv
+5. Test `conv_xy` (depthwise 5×1×1) — the stem temporal conv
+
+Only after all five pass with 0 LSB HW-vs-Sim tolerance do we integrate into the full model.
+
+---
+
+## 28. Updated File Layout
+
+The complete project file layout, including all components documented in this file:
+
+```
+x3d/
+├── main.py                       # Float32 inference entry point with profiling (CLI)
+├── main_int8.py                  # Int8 hybrid inference entry point (CLI)
+├── dashboard.py                  # Interactive web profiling dashboard (Dash/Plotly)
+├── visualize_stats.py            # Cross-platform profiling comparison & charts
+├── x3d_layers.py                 # PyTorch reference implementation (verification only)
+├── fpga_flow.md                  # Comprehensive FPGA integration plan
+├── DOCUMENTATION.md              # This file
+├── CLAUDE.md                     # Project conventions for AI assistants
+├── README.md                     # Quick-start README
+│
+├── scratch/                      # The PyTorch-free neural network library
+│   ├── __init__.py               # Public API: X3D_M, set_conv3d_method, etc.
+│   ├── ops/                      # Stateless mathematical operations
+│   │   ├── __init__.py           # Re-exports all ops
+│   │   ├── conv3d.py             # 4 conv methods (slow/fast/threaded/native)
+│   │   ├── conv3d_c/             # Float32 C backend (libconv3d.so)
+│   │   │   ├── conv3d.c          # Pthreads, spatial tiling, 3 fast paths
+│   │   │   ├── conv3d.h          # C API header
+│   │   │   └── Makefile          # Build for RISC-V or native x86
+│   │   ├── conv3d_fpga.py        # Python ctypes wrapper for FPGA int8 C backend
+│   │   ├── conv3d_fpga_c/        # Int8 FPGA-offload C backend (libconv3d_fpga.so)
+│   │   │   ├── conv3d_fpga.c     # int8×int8→int32 + (M0,n) requant, pthreads
+│   │   │   ├── conv3d_fpga.h     # C API header
+│   │   │   └── Makefile          # Build for RISC-V or native x86
+│   │   ├── conv3d_simple_c/      # Minimal int8 conv: SW + FPGA stub + test
+│   │   │   ├── conv3d_simple.h   # Shared API header
+│   │   │   ├── conv3d_sw.c       # CPU reference (nested loops)
+│   │   │   ├── conv3d_fpga.c     # FPGA stub (DMA placeholders)
+│   │   │   ├── main.c            # Small single-config compare test
+│   │   │   └── Makefile
+│   │   ├── batchnorm3d.py        # 3D batch normalization
+│   │   ├── activations.py        # relu, silu, sigmoid
+│   │   ├── pooling.py            # avg_pool3d, adaptive_avg_pool3d
+│   │   ├── linear.py             # Dense/fully-connected layer
+│   │   └── dropout.py            # Dropout regularization
+│   ├── nn/                       # Stateful neural network modules
+│   │   ├── __init__.py           # Re-exports all nn modules
+│   │   ├── module.py             # Base Module class
+│   │   ├── sequential.py         # Sequential + ModuleList
+│   │   ├── conv3d.py             # Conv3d layer
+│   │   ├── batchnorm3d.py        # BatchNorm3d layer
+│   │   ├── squeeze_excitation.py # SE attention block
+│   │   ├── bottleneck.py         # conv_a → conv_b → conv_c pipeline
+│   │   ├── resblock.py           # Bottleneck + skip connection
+│   │   ├── resstage.py           # Stage of ResBlocks
+│   │   ├── stem.py               # (2+1)D factorized stem
+│   │   └── head.py               # Classification head
+│   ├── quantized/                # Int8 quantized runtime (FPGA-oriented)
+│   │   ├── __init__.py           # Public API
+│   │   ├── conv3d_int8.py        # Software reference int8 conv kernel
+│   │   ├── layers.py             # QuantizedConv3d + QuantizedLinear modules
+│   │   ├── load_int8_weights.py  # Int8 .npz weight loader
+│   │   └── model.py              # QuantizedX3D_M builder
+│   ├── models/
+│   │   ├── __init__.py
+│   │   └── x3d_m.py              # Full X3D-M model assembly
+│   ├── load_weights.py           # Float32 .npz weight loader
+│   └── stats.py                  # StatsCollector, FLOPs estimation
+│
+├── scripts/
+│   ├── convert_pytorch_weights_to_numpy.py  # PyTorch → float32 .npz
+│   ├── quantize_x3d_ptq.py                 # Float32 → int8 .npz (PTQ)
+│   └── validate_quantization.py             # Validate int8 weights
+│
+├── fpga_tests/                   # Per-layer FPGA offload validation
+│   ├── __init__.py
+│   ├── README.md                 # Detailed harness documentation
+│   ├── test_layer.py             # CLI: float, SW-int8, FPGA-sim, FPGA-HW
+│   ├── kernels.py                # Three int8 conv implementations
+│   ├── quant.py                  # Int8 quantization / requantization primitives
+│   ├── layer_configs.py          # Conv layer specs for all X3D-M conv types
+│   └── runs/                     # Output tensors + JSON summaries (gitignored)
+│
+├── testing/                      # Minimal int8 C conv: full 28-layer test
+│   ├── README.md
+│   ├── conv3d_simple.h           # Shared C API
+│   ├── conv3d_sw.c               # CPU reference
+│   ├── conv3d_fpga.c             # FPGA stub
+│   ├── main.c                    # 28-layer compare harness
+│   ├── layers.md                 # Layer configuration documentation
+│   └── Makefile
+│
+├── docs/                         # Supplementary documentation
+│   ├── In Depth.md               # Deep-dive: memory layout, conv math, data flow
+│   ├── Math.md                   # Mathematical foundations
+│   ├── Quantization.md           # Quantization theory and practice
+│   └── SCRATCH_IMPLEMENTATION.md # Implementation notes
+│
+├── weights/                      # .npz weight files (gitignored)
+├── run_stats/                    # Profiling output (gitignored)
+├── archive/                      # Legacy C++/PyTorch code (not used)
+└── build/                        # CMake build artifacts (legacy)
+```
+
+---
+
+## 29. Suggested Diagrams and Figures
+
+The following diagrams would enhance this documentation if included in the official report. Each is described textually here for reference:
+
+### Figure 1: X3D-M Architecture Block Diagram
+A top-down flowchart showing: Input (3×16×224×224) → Stem → Stage 2 → Stage 3 → Stage 4 → Stage 5 → Head → Output (400). Each stage box shows depth, channel counts, and spatial resolution.
+
+### Figure 2: ResBlock Internal Structure
+Two parallel paths: Branch 2 (conv_a → BN → ReLU → conv_b → BN → [SE] → SiLU → conv_c → BN) and Branch 1 (Identity or 1×1 Conv+BN). Merge with element-wise addition → ReLU.
+
+### Figure 3: Bottleneck Channel Flow (Inverted Bottleneck)
+A width diagram showing: narrow (in_channels) → wide (inner_channels via conv_a) → wide (inner_channels via conv_b depthwise) → narrow (out_channels via conv_c). Shows the "expand → filter → project" pattern.
+
+### Figure 4: Squeeze-and-Excitation Block
+Diagram showing: Input (B,C,T,H,W) → Global Avg Pool → (B,C,1,1,1) → Conv1×1 → ReLU → Conv1×1 → Sigmoid → (B,C,1,1,1) attention weights → Multiply with Input.
+
+### Figure 5: (2+1)D Factorized Stem
+Two sequential boxes: conv_t (1×3×3, spatial filtering, 224→112) → conv_xy (5×1×1, temporal filtering, T preserved) → BN → ReLU.
+
+### Figure 6: ops/ vs nn/ Two-Layer Architecture
+Side-by-side diagram: Left column (ops/) shows pure functions with arrows in/out. Right column (nn/) shows Module classes containing _parameters dict and calling ops/ functions in forward().
+
+### Figure 7: Convolution Method Selection Flowchart
+Decision tree: Is method "native"? → C backend. Is method "threaded"? → Is depthwise? → Temporal parallelism / Output-channel parallelism. Is method "fast"? → Single-threaded OpenCV. Else → Pure NumPy loops.
+
+### Figure 8: Int8 Quantization Pipeline
+Linear flow: Float32 Model → BN Folding → Calibration (collect activation ranges) → Per-channel weight quantization → Per-tensor activation quantization → Int8 .npz export.
+
+### Figure 9: Quantized Conv3d Forward Pass
+Three-step diagram: float32 input → [Quantize: ÷ s_in, round, clip] → int8 → [Int8 Conv: int8×int8→int32, +bias_q, ×M, round, clip] → int8 → [Dequantize: × s_out] → float32 output.
+
+### Figure 10: FPGA Test Harness Four-Path Comparison
+Four parallel lanes showing Float Ref, SW Int8, FPGA Sim, FPGA HW, all starting from the same input and converging at a comparison node that reports diff statistics.
+
+### Figure 11: PolarFire SoC Block Diagram
+Shows: 1× E51 Monitor Core + 4× U54 Application Cores → L2 Cache → DDR4 Controller → 2GB LPDDR4. Side connection: AXI bus → FPGA Fabric (254K LEs, 784 Math Blocks).
+
+### Figure 12: Spatial Resolution Through the Network
+A stepped bar chart showing H×W at each stage: 224×224 → 112×112 (Stem) → 56×56 (Stage 2) → 28×28 (Stage 3) → 14×14 (Stage 4) → 7×7 (Stage 5) → 1×1 (Head pool).
+
+### Figure 13: Channel Count Through the Network
+Bar chart: 3 (input) → 24 (Stem) → 24/54 (Stage 2) → 48/108 (Stage 3) → 96/216 (Stage 4) → 192/432 (Stage 5) → 432→2048→400 (Head). Shows outer/inner channel pairs.
+
+### Figure 14: C Backend Spatial Tiling
+Diagram of a 2D spatial plane divided into TILE_H×TILE_W (8×16) tiles, with the kernel's receptive field overlapping tile boundaries, showing how each tile fits in the 32KB L1 cache.
+
+### Figure 15: Threading Strategy Decision
+Two-column comparison: Left (Output-Channel Parallelism): many small tasks spread across 4 threads, used for pointwise/standard convs. Right (Temporal Parallelism): few large tasks, each thread processes T/4 temporal positions, used for depthwise convs.
+
+---
+
+## 30. Summary of All Implemented Components
+
+| Component | Status | Files | Description |
+|-----------|--------|-------|-------------|
+| Float32 scratch library | Complete | scratch/ops/, scratch/nn/ | PyTorch-free NumPy/OpenCV inference |
+| X3D-M model assembly | Complete | scratch/models/x3d_m.py | Full model with pretrained weight loading |
+| Pure NumPy conv (slow) | Complete | scratch/ops/conv3d.py | Correctness reference, 6-deep nested loops |
+| OpenCV conv (fast) | Complete | scratch/ops/conv3d.py | Single-threaded cv2.filter2D |
+| Multi-threaded conv (threaded) | Complete | scratch/ops/conv3d.py | Adaptive hybrid parallelism, 4 threads |
+| C backend conv (native) | Complete | scratch/ops/conv3d_c/ | Pthreads, spatial tiling, 3 fast paths |
+| Float32 weight converter | Complete | scripts/convert_pytorch_weights_to_numpy.py | PyTorch → .npz |
+| Float32 weight loader | Complete | scratch/load_weights.py | .npz → scratch model |
+| Profiling system | Complete | scratch/stats.py, main.py | Per-layer timing, FLOPs, platform detection |
+| Visualization | Complete | visualize_stats.py | Charts, HTML reports, cross-platform comparison |
+| PyTorch reference | Complete | x3d_layers.py | Verification against official PyTorchVideo |
+| Int8 PTQ script | Complete | scripts/quantize_x3d_ptq.py | BN folding, calibration, export int8 .npz |
+| Int8 quantized runtime | Complete | scratch/quantized/ | QuantizedConv3d, QuantizedX3D_M, int8 loader |
+| Int8 reference conv kernel | Complete | scratch/quantized/conv3d_int8.py | Pure NumPy int8 conv for validation |
+| Int8 inference entry point | Complete | main_int8.py | CLI for hybrid int8 model |
+| FPGA int8 C backend | Complete | scratch/ops/conv3d_fpga_c/ | int8×int8→int32 + (M0,n) requant in C |
+| FPGA Python wrapper | Complete | scratch/ops/conv3d_fpga.py | ctypes bindings for libconv3d_fpga.so |
+| FPGA per-layer test harness | Complete | fpga_tests/ | 4-path comparison, 5 conv types |
+| Minimal int8 C test | Complete | testing/, conv3d_simple_c/ | 28-layer SW-vs-FPGA-stub comparison |
+| Quantization validation | Complete | scripts/validate_quantization.py | Sanity check int8 weights |
+| Dashboard | Complete | dashboard.py | Interactive web profiling dashboard |
+| Real FPGA fabric driver | Not started | — | Replace C backend with DMA calls |
+| BN folding in scratch runtime | Not started | — | Fold BN into conv weights at load time |
+| Int8 lookup table for SiLU | Not started | — | 256-entry table replacing dequant/SiLU/requant |
+
+
 ## 18. Glossary
 
 **Action Recognition**: the computer vision task of classifying the human action being performed in a video clip (e.g., "playing basketball", "cooking").
@@ -1381,3 +2120,6 @@ These files are retained for historical reference but are not used by the curren
 **(2+1)D Factorization**: decomposing a 3D convolution into a 2D spatial convolution followed by a 1D temporal convolution, reducing parameters while maintaining expressiveness.
 
 **X3D (eXpand 3D)**: a family of efficient 3D CNN architectures for video understanding, designed by Facebook AI Research through progressive network expansion.
+
+---
+
