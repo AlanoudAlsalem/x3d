@@ -37,9 +37,6 @@ run_stats/*.json
 run_stats/*.txt
 run_stats/*.html
 
-# Model weights (large binaries; generate via scripts/convert_pytorch_weights_to_numpy.py)
-weights/*.npz
-
 # Test and debug
 *.log
 .pytest_cache/
