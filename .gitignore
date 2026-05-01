@@ -15,6 +15,7 @@ archive/
 
 # IDE and editor
 .vscode/
+.vscode
 .idea/
 *.swp
 *.swo
@@ -80,6 +81,7 @@ main_int8.py
 
 # visualization
 dashboard.py
+requirements-dashboard.txt
 visualize_stats.py
 x3d_layers.py
 x3d_m_layers.txt
