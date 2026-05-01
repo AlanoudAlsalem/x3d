@@ -33,6 +33,7 @@ from typing import Optional, Tuple, Union
 from concurrent.futures import ThreadPoolExecutor
 import cv2
 import time
+import matplotlib.pyplot as plt
 
 # ---------------------------------------------------------------------------
 # Global configuration
@@ -554,7 +555,7 @@ def conv3d_core(volume: np.ndarray, kernel: np.ndarray) -> np.ndarray:
 
 if __name__ == "__main__":
     np.random.seed(42)
-    x = np.random.rand(1, 3, 5, 32, 32)
+    x = np.random.rand(1, 3, 8, 32, 32)
     weight = np.random.rand(3, 1, 3, 3, 3)
     stride = (1, 1, 1)
     padding = (1, 1, 1)
@@ -563,39 +564,81 @@ if __name__ == "__main__":
     print("-"*100)
     print("Validation of function outputs")
     print("-"*100, "\n")
+    
+    TRIALS = 10
+    latencies = {
+        "slow" : np.zeros(TRIALS),
+        "fast" : np.zeros(TRIALS),
+        "threaded" : np.zeros(TRIALS),
+        "native" : np.zeros(TRIALS),
+    }
+    
+    # initialize error values
+    fast_err = 0.0
+    threaded_err = 0.0
+    native_err = 0.0
+    
+    # compute latency over 10 trials
+    for i in range(TRIALS):
+        start = time.perf_counter()
+        slow = conv3d_forward(x, weight, None, stride, padding, groups, "slow")
+        end = time.perf_counter()
+        latency = end-start
+        latencies["slow"][i] = latency
 
-    print("Slow kernel convolving...")
-    start = time.time()
-    slow = conv3d_forward(x, weight, None, stride, padding, groups, "slow")
-    end = time.time()
-    latency = end-start
-    print(f"Slow latency: {latency:.3f}\n")
+        start = time.perf_counter()
+        fast = conv3d_forward(x, weight, None, stride, padding, groups, "fast")
+        end = time.perf_counter()
+        latency = end-start
+        latencies["fast"][i] = latency
 
-    print("Fast kernel convolving...")
-    start = time.time()
-    fast = conv3d_forward(x, weight, None, stride, padding, groups, "fast")
-    end = time.time()
-    latency = end-start
-    print(f"Fast latency: {latency:.3f}\n")
+        start = time.perf_counter()
+        threaded = conv3d_forward(x, weight, None, stride, padding, groups, "threaded")
+        end = time.perf_counter()
+        latency = end-start
+        latencies["threaded"][i] = latency
 
-    print("Threaded kernel convolving...")
-    start = time.time()
-    threaded = conv3d_forward(x, weight, None, stride, padding, groups, "threaded")
-    end = time.time()
-    latency = end-start
-    print(f"Threaded latency: {latency:.3f}\n")   
+        start = time.perf_counter()
+        native = conv3d_forward(x, weight, None, stride, padding, groups, "native")
+        end = time.perf_counter()
+        latency = end-start
+        latencies["native"][i] = latency
 
-    print("Native kernel convolving...")
-    start = time.time()
-    native = conv3d_forward(x, weight, None, stride, padding, groups, "native")
-    end = time.time()
-    latency = end-start
-    print(f"Native latency: {latency:.3f}\n")   
+        fast_err += np.sum(slow - fast)
+        threaded_err += np.sum(threaded - fast)
+        native_err += np.sum(native - fast)
 
-    fast_err = np.sum(slow - fast)
-    threaded_err = np.sum(threaded - fast)
-    native_err = np.sum(native - fast)
+    print(f"Fast error = {fast_err/TRIALS}")
+    print(f"Threaded error = {threaded_err/TRIALS}")
+    print(f"Native error = {native_err/TRIALS}")
 
-    print(f"Fast error = {fast_err}")
-    print(f"Threaded error = {threaded_err}")
-    print(f"Native errror = {native_err}")
+    slow_avg_latency = np.sum(latencies["slow"]/TRIALS)
+    fast_avg_latency = np.sum(latencies["fast"]/TRIALS)
+    threaded_avg_latency = np.sum(latencies["threaded"]/TRIALS)
+    native_avg_latency = np.sum(latencies["native"]/TRIALS)
+
+    categories = latencies.keys()
+    values = [
+        slow_avg_latency,
+        fast_avg_latency,
+        threaded_avg_latency,
+        native_avg_latency
+    ]
+
+    print(f"Slow latency = {slow_avg_latency}")
+    print(f"Fast latency = {fast_avg_latency}")
+    print(f"Threaded latency = {threaded_avg_latency}")
+    print(f"Native latency = {native_avg_latency}")
+
+    # plot
+    bars = plt.bar(categories, values, color="skyblue")
+    plt.bar_label(bars, fmt='%.5f')
+
+    # Add labels and title
+    plt.xlabel('Implementation')
+    plt.ylabel('Latency')
+    plt.title('3D Convolution Software Implementations & their Latencies')
+
+    # Display the plot
+    plt.show()
+

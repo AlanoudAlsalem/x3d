@@ -1,25 +1,16 @@
 """
-X3D-M built from scratch (no PyTorch) for RISC-V SoC compatibility.
+X3D-M built using the scratch library for RISC-V SoC compatibility.
 
-Uses the modular scratch implementation in the `scratch` package. All tensors
-are NumPy arrays; layout is (B, C, T, H, W) for 3D data.
+Uses the modular implementation in the `scratch` package. 
+All tensors are NumPy arrays: (B, C, T, H, W).
 
-This version includes comprehensive profiling and statistics collection for
-performance analysis across different platforms (macOS, PolarFire SoC, etc.).
-
-Example (random init):
-    from main import build_x3d_m, run_forward
-    import numpy as np
-    model = build_x3d_m(num_classes=400)
-    model.eval()
-    x = np.random.randn(1, 3, 16, 224, 224).astype(np.float32)
-    logits = run_forward(model, x)
+This version includes comprehensive profiling and statistics collection for performance analysis across different platforms.
 
 Example (with pretrained weights on SoC):
     model = build_x3d_m(num_classes=400, weights_path="weights/x3d_m_kinetics400.npz")
     model.eval()
 
-Example (with profiling):
+Run with profiling:
     python main.py --profile --notes "Testing on MacBook Pro"
 """
 
@@ -48,10 +39,8 @@ def build_x3d_m(
     strict_weights: bool = True,
 ) -> X3D_M:
     """
-    Build X3D-M model (optionally load pretrained weights). No PyTorch.
-
-    Weights file must be a .npz produced by scripts/convert_pytorch_weights_to_numpy.py
-    on a machine with PyTorch, then copied to the SoC.
+    Build X3D-M model. Weights file must be a .npz produced by scripts/convert_pytorch_weights_to_numpy.py 
+    on a machine with PyTorch.
 
     Args:
         num_classes: Number of output classes (default 400 for Kinetics).
