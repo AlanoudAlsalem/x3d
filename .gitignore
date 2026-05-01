@@ -66,5 +66,11 @@ Untitled.md
 x3d_m_layers.txt   # generated model inspection output
 videos/            # test video files
 
+# Documentation
 CLAUDE.md
 docs/
+DOCUMENTATION.md
+fpga_flow.md
+
+# Data
+scripts/kinetics-dataset/

@@ -1,17 +1,16 @@
 """
-3D convolution (no PyTorch). Supports standard and depthwise (groups=in_channels).
+3D convolution. Supports standard and depthwise (groups=in_channels).
 
 Four implementation strategies selectable via set_conv3d_method() or per-call:
 
-  "slow"     — Pure NumPy fallback for platforms without OpenCV (e.g. some
+  "slow"     — Pure NumPy 6 nested for-loops fallback for platforms without OpenCV (e.g. some
                RISC-V embedded systems). No external dependencies beyond NumPy.
 
   "fast"     — Single-threaded OpenCV path. Uses cv2.filter2D for accelerated
                2-D convolution, looping over temporal/channel dimensions.
 
   "threaded" — Multi-threaded OpenCV path targeting the PolarFire SoC's 4 U54
-               RISC-V application cores via adaptive hybrid parallelism
-               (see DOCUMENTATION.md Section 14):
+               RISC-V application cores via adaptive hybrid parallelism:
                  - Pointwise / standard convolutions: output-channel parallelism
                  - Depthwise convolutions: temporal parallelism within conv3d_core
                NumPy and OpenCV release the GIL during C-level computation, so
@@ -33,6 +32,7 @@ import numpy as np
 from typing import Optional, Tuple, Union
 from concurrent.futures import ThreadPoolExecutor
 import cv2
+import time
 
 # ---------------------------------------------------------------------------
 # Global configuration
@@ -54,6 +54,7 @@ _c_float_p = ctypes.POINTER(ctypes.c_float)
 
 def _load_c_backend() -> None:
     global _c_lib
+    # points to the absolute path of the folder
     lib_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "conv3d_c")
 
     for name in ("libconv3d.so", "libconv3d.dylib"):
@@ -215,7 +216,7 @@ def conv3d_forward_slow(
     out_c, c_per_group, kT, kH, kW = weight.shape
     st, sh, sw = stride
     pt, ph, pw = padding
-
+     
     if in_c % groups != 0 or out_c % groups != 0:
         raise ValueError("in_channels and out_channels must be divisible by groups")
     if in_c // groups != c_per_group:
@@ -230,12 +231,11 @@ def conv3d_forward_slow(
 
     out = np.zeros((B, out_c, T_out, H_out, W_out), dtype=x.dtype)
 
-    for b in range(B):
-        for oc in range(out_c):
-            g = oc % groups
+    for b in range(B): # number of batches
+        for oc in range(out_c): # number of output channels
+            g = oc % groups # g figures out which group of input channels this output should read from
             c_start = g * c_per_group
-            c_end = c_start + c_per_group
-            acc = np.zeros((T_out, H_out, W_out), dtype=x.dtype)
+            acc = np.zeros((T_out, H_out, W_out), dtype=x.dtype) # accumulator
             for c in range(c_per_group):
                 w = weight[oc, c, :, :, :]  # (kT, kH, kW)
                 inp = x_pad[b, c_start + c, :, :, :]  # (Tp, Hp, Wp)
@@ -288,7 +288,6 @@ def conv3d_forward_fast(
             kernel_volume = weight[oc]
 
             dense_out = conv3d_core(inp_volume, kernel_volume)
-
             strided_out = dense_out[::st, ::sh, ::sw]
 
             out[b, oc] = strided_out.astype(x.dtype)
@@ -353,7 +352,7 @@ def _conv3d_oc_parallel(
     """Strategy 1: distribute (batch, output-channel) pairs across threads.
 
     Each thread processes a contiguous chunk of (b, oc) pairs.  Different
-    chunks write to non-overlapping slices of *out*, so no synchronisation
+    chunks write to non-overlapping slices of out, so no synchronisation
     is needed.  conv3d_core spends nearly all time inside cv2.filter2D /
     NumPy C code that releases the GIL, giving true parallelism.
     """
@@ -552,3 +551,51 @@ def conv3d_core(volume: np.ndarray, kernel: np.ndarray) -> np.ndarray:
                 out_volume[tt] += filtered[:H_out, :W_out]
 
     return out_volume
+
+if __name__ == "__main__":
+    np.random.seed(42)
+    x = np.random.rand(1, 3, 5, 32, 32)
+    weight = np.random.rand(3, 1, 3, 3, 3)
+    stride = (1, 1, 1)
+    padding = (1, 1, 1)
+    groups = 3
+
+    print("-"*100)
+    print("Validation of function outputs")
+    print("-"*100, "\n")
+
+    print("Slow kernel convolving...")
+    start = time.time()
+    slow = conv3d_forward(x, weight, None, stride, padding, groups, "slow")
+    end = time.time()
+    latency = end-start
+    print(f"Slow latency: {latency:.3f}\n")
+
+    print("Fast kernel convolving...")
+    start = time.time()
+    fast = conv3d_forward(x, weight, None, stride, padding, groups, "fast")
+    end = time.time()
+    latency = end-start
+    print(f"Fast latency: {latency:.3f}\n")
+
+    print("Threaded kernel convolving...")
+    start = time.time()
+    threaded = conv3d_forward(x, weight, None, stride, padding, groups, "threaded")
+    end = time.time()
+    latency = end-start
+    print(f"Threaded latency: {latency:.3f}\n")   
+
+    print("Native kernel convolving...")
+    start = time.time()
+    native = conv3d_forward(x, weight, None, stride, padding, groups, "native")
+    end = time.time()
+    latency = end-start
+    print(f"Native latency: {latency:.3f}\n")   
+
+    fast_err = np.sum(slow - fast)
+    threaded_err = np.sum(threaded - fast)
+    native_err = np.sum(native - fast)
+
+    print(f"Fast error = {fast_err}")
+    print(f"Threaded error = {threaded_err}")
+    print(f"Native errror = {native_err}")

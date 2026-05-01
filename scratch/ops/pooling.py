@@ -1,5 +1,5 @@
 """
-3D pooling (no PyTorch): AvgPool3d and AdaptiveAvgPool3d.
+3D pooling: AvgPool3d and AdaptiveAvgPool3d.
 """
 
 from __future__ import annotations

@@ -1,5 +1,5 @@
 """
-3D Batch normalization (no PyTorch). Normalizes over (B, T, H, W) per channel.
+3D Batch normalization. Normalizes over (B, T, H, W) per channel.
 """
 
 from __future__ import annotations

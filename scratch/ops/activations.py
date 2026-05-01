@@ -1,5 +1,5 @@
 """
-Activation functions (no PyTorch): ReLU, SiLU (Swish), Sigmoid.
+Activation functions: ReLU, SiLU (Swish), Sigmoid.
 """
 
 from __future__ import annotations

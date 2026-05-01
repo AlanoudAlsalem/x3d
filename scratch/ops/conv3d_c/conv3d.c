@@ -40,7 +40,7 @@ static inline long idx5(int i0, int i1, int i2, int i3, int i4,
 
 /*
  * Read from NCTHW input with implicit zero-padding.
- * (t, h, w) are in *padded* coordinates.  The function subtracts the
+ * (t, h, w) are in padded coordinates.  The function subtracts the
  * padding offsets to recover the actual position and returns 0.0f for
  * any out-of-bounds access.  The unsigned cast folds the < 0 and >= dim
  * checks into a single comparison.
