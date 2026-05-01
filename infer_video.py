@@ -262,7 +262,7 @@ def preprocess_frames(frames: List[np.ndarray]) -> np.ndarray:
 #  STEP 6 — Load Kinetics-400 labels
 # ═══════════════════════════════════════════════════════════════════
 
-def load_labels(path: str = "archive/kinetics400_labels.txt") -> List[str]:
+def load_labels(path: str = "kinetics400_labels.txt") -> List[str]:
     """
     Load the 400 class names from the text file.
     Each line is one class, order matches model output indices.
@@ -460,7 +460,7 @@ Examples:
     parser.add_argument(
         "--labels", "-l",
         type=str,
-        default="archive/kinetics400_labels.txt",
+        default="kinetics400_labels.txt",
         help="Path to Kinetics-400 label file",
     )
     parser.add_argument(
