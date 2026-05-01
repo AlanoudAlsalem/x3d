@@ -1,2 +1,0 @@
-streamlit>=1.51
-plotly>=5.18
