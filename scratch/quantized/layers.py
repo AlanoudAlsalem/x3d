@@ -28,6 +28,10 @@ import numpy as np
 
 from scratch.nn.module import Module
 from scratch.quantized.conv3d_int8 import conv3d_int8_forward
+from scratch.ops.conv3d_int8 import (
+    conv3d_int8_forward as _ops_conv3d_int8,
+    VALID_METHODS as _OPS_INT8_METHODS,
+)
 
 
 def _triple(v: Union[int, Tuple[int, int, int]]) -> Tuple[int, int, int]:
@@ -69,6 +73,7 @@ class QuantizedConv3d(Module):
         bias: bool = True,
         groups: int = 1,
         backend: str = "reference",
+        method: Optional[str] = None,
     ) -> None:
         super().__init__()
         self.in_channels = in_channels
@@ -78,6 +83,11 @@ class QuantizedConv3d(Module):
         self.padding = _triple(padding)
         self.groups = groups
         self.backend = backend
+        if method is not None and method not in _OPS_INT8_METHODS:
+            raise ValueError(
+                f"method must be one of {_OPS_INT8_METHODS}, got {method!r}"
+            )
+        self.method = method
 
         kT, kH, kW = self.kernel_size
         c_per_group = in_channels // groups
@@ -144,7 +154,31 @@ class QuantizedConv3d(Module):
         return y_q.astype(np.float32) * np.float32(self.output_scale)
 
     def _run_backend(self, x_q: np.ndarray) -> np.ndarray:
-        """Dispatch the int8 convolution to the configured backend."""
+        """Dispatch the int8 convolution to the configured backend.
+
+        When ``self.method`` is set (one of "slow", "fast", "threaded",
+        "native"), the ops-level kernel from ``scratch.ops.conv3d_int8`` is
+        used for the core int8 convolution and bias + requantization are
+        handled locally.  Otherwise the quantized-subpackage reference
+        kernel (full pipeline) is used.
+        """
+        if self.method is not None:
+            acc = _ops_conv3d_int8(
+                x_q, self.weight_q,
+                stride=self.stride, padding=self.padding,
+                groups=self.groups, method=self.method,
+            )
+            if self.bias_q is not None:
+                acc = acc + self.bias_q.reshape(1, -1, 1, 1, 1)
+            C_out = acc.shape[1]
+            M = (np.float32(self.input_scale)
+                 * self.weight_scale.astype(np.float32)
+                 ) / np.float32(self.output_scale)
+            y_f = acc.astype(np.float32) * M.reshape(1, C_out, 1, 1, 1)
+            y_rounded = np.rint(y_f)
+            np.clip(y_rounded, -127, 127, out=y_rounded)
+            return y_rounded.astype(np.int8)
+
         if self.backend == "reference":
             return conv3d_int8_forward(
                 x_q=x_q,

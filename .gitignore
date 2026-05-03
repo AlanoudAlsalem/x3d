@@ -73,9 +73,6 @@ fpga_flow.md
 # Data
 scripts/kinetics-dataset/
 
-# quantized 
-main_int8.py 
-
 # visualization
 dashboard.py
 requirements-dashboard.txt

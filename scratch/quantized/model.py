@@ -69,7 +69,7 @@ class _IdentityModule(Module):
         return x
 
 
-def _swap_conv_and_bn(parent: Module, backend: str) -> None:
+def _swap_conv_and_bn(parent: Module, backend: str, method: str | None = None) -> None:
     """
     Recursively rewrite ``parent``'s child modules:
 
@@ -92,6 +92,7 @@ def _swap_conv_and_bn(parent: Module, backend: str) -> None:
                 bias=(child._parameters.get("bias") is not None),
                 groups=child.groups,
                 backend=backend,
+                method=method,
             )
             parent._modules[name] = new
             # Many parent modules hold a direct attribute reference
@@ -109,7 +110,7 @@ def _swap_conv_and_bn(parent: Module, backend: str) -> None:
         else:
             # Recurse into everything else (ResStage, ResBlock, Bottleneck,
             # SqueezeExcitation, Stem, Head, ProjectedPool, ModuleList, ...).
-            _swap_conv_and_bn(child, backend)
+            _swap_conv_and_bn(child, backend, method=method)
 
 
 class QuantizedX3D_M(X3D_M):
@@ -123,9 +124,14 @@ class QuantizedX3D_M(X3D_M):
     debugging and profiling.
     """
 
-    def __init__(self, num_classes: int = 400, backend: str = "reference") -> None:
+    def __init__(
+        self,
+        num_classes: int = 400,
+        backend: str = "reference",
+        method: str | None = None,
+    ) -> None:
         super().__init__(num_classes=num_classes)
-        _swap_conv_and_bn(self, backend=backend)
+        _swap_conv_and_bn(self, backend=backend, method=method)
 
 
 def build_quantized_x3d_m(
@@ -133,6 +139,7 @@ def build_quantized_x3d_m(
     weights_path: Optional[Union[str, Path]] = None,
     *,
     backend: str = "reference",
+    method: Optional[str] = None,
     strict_weights: bool = False,
     verbose: bool = False,
 ) -> QuantizedX3D_M:
@@ -151,6 +158,11 @@ def build_quantized_x3d_m(
         Backend for QuantizedConv3d: ``"reference"`` (NumPy software kernel,
         the default, used for validating the pipeline) or ``"fpga"`` (real
         hardware driver; not wired up yet).
+    method : str, optional
+        Int8 convolution implementation from ``scratch.ops.conv3d_int8``:
+        ``"slow"``, ``"fast"``, ``"threaded"``, or ``"native"``.
+        When set, the ops-level kernel is used instead of the quantized
+        reference kernel.  Default ``None`` (use the reference kernel).
     strict_weights : bool
         If True, raise on any missing quantized parameter. Default False
         because the Head Linear's float32 ``proj_weight`` / ``proj_bias``
@@ -162,7 +174,7 @@ def build_quantized_x3d_m(
     -------
     QuantizedX3D_M
     """
-    model = QuantizedX3D_M(num_classes=num_classes, backend=backend)
+    model = QuantizedX3D_M(num_classes=num_classes, backend=backend, method=method)
     if weights_path is not None:
         from scratch.quantized.load_int8_weights import load_int8_weights
         load_int8_weights(model, weights_path, strict=strict_weights, verbose=verbose)

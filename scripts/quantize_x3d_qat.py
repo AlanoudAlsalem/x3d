@@ -232,11 +232,17 @@ class Kinetics400Dataset(Dataset):
         if not cap.isOpened():
             return None
 
+        # Set a read timeout to avoid hanging on corrupt files.
+        # OpenCV's FFMPEG backend can stall for 15+ minutes on partial files.
+        cap.set(cv2.CAP_PROP_OPEN_TIMEOUT_MSEC, 5000)   # 5s open timeout
+        cap.set(cv2.CAP_PROP_READ_TIMEOUT_MSEC, 5000)    # 5s read timeout
+
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         if total_frames <= 0:
-            # Try reading frames directly if metadata is missing
+            # Try reading a few frames directly if metadata is missing.
+            # Cap at 300 frames to avoid infinite loops on broken streams.
             frames = []
-            while True:
+            for _ in range(300):
                 ret, frame = cap.read()
                 if not ret:
                     break
@@ -247,6 +253,11 @@ class Kinetics400Dataset(Dataset):
             total_frames = len(frames)
             indices = np.linspace(0, total_frames - 1, self.num_frames, dtype=int)
             return np.stack([frames[i] for i in indices])
+
+        # Sanity check: skip absurdly long or zero-length videos
+        if total_frames > 100000:
+            cap.release()
+            return None
 
         # Uniform temporal sampling
         indices = np.linspace(0, total_frames - 1, self.num_frames, dtype=int)
@@ -297,29 +308,37 @@ class Kinetics400Dataset(Dataset):
         return cropped
 
     def __getitem__(self, index: int) -> Tuple[torch.Tensor, int]:
-        path, label = self.samples[index]
+        # Try up to 5 different videos before giving up (handles corrupt files)
+        for attempt in range(5):
+            try:
+                idx = index if attempt == 0 else np.random.randint(0, len(self.samples))
+                path, label = self.samples[idx]
 
-        frames = self._load_video_frames(path)
-        if frames is None:
-            # Fallback: return a random other sample (handles corrupt videos)
-            alt_idx = np.random.randint(0, len(self.samples))
-            return self.__getitem__(alt_idx)
+                frames = self._load_video_frames(path)
+                if frames is None:
+                    continue
 
-        # Spatial transforms
-        frames = self._spatial_transform(frames)  # (T, H, W, 3) uint8
+                # Spatial transforms
+                frames = self._spatial_transform(frames)  # (T, H, W, 3) uint8
 
-        # Random horizontal flip during training
-        if self.is_train and np.random.rand() < 0.5:
-            frames = frames[:, :, ::-1, :].copy()
+                # Random horizontal flip during training
+                if self.is_train and np.random.rand() < 0.5:
+                    frames = frames[:, :, ::-1, :].copy()
 
-        # Normalize: uint8 [0,255] -> float32 [0,1] -> (x - mean) / std
-        frames = frames.astype(np.float32) / 255.0
-        frames = (frames - self.MEAN) / self.STD
+                # Normalize: uint8 [0,255] -> float32 [0,1] -> (x - mean) / std
+                frames = frames.astype(np.float32) / 255.0
+                frames = (frames - self.MEAN) / self.STD
 
-        # (T, H, W, C) -> (C, T, H, W) for PyTorch
-        frames = np.transpose(frames, (3, 0, 1, 2))
+                # (T, H, W, C) -> (C, T, H, W) for PyTorch
+                frames = np.transpose(frames, (3, 0, 1, 2))
 
-        return torch.from_numpy(frames.copy()), label
+                return torch.from_numpy(frames.copy()), label
+            except Exception:
+                continue
+
+        # All attempts failed — return a zero tensor with label 0
+        dummy = torch.zeros(3, self.num_frames, self.crop_size, self.crop_size)
+        return dummy, 0
 
 
 # ============================================================================
